@@ -6,7 +6,7 @@ Landing de la firma: quiénes somos, Profit Engineering, la Auditoría de Perfor
 - `plantilla.html` — fuente editable. El marcador `__DATA__` se sustituye por el JSON de fugas y nodos que se extrae de `Documents/TT AGENCY/pitch-tt-agency.html`.
 - `assets/` — ícono, imagen de vista previa (og) y captura del demo del ERP.
 
-Hero: objeto 3D en vivo (three.js) con anillos que se alinean conforme baja el scroll, partículas y paralaje del puntero; respeta `prefers-reduced-motion`. Si más adelante se genera la película del hero, se coloca en `assets/hero.mp4` y se apunta con `data-src` en `<video id="film">`: el video se recorre con el scroll y el 3D queda detrás.
+Hero: **película generada** (`assets/hero.mp4`, 15 s, versión de celular en `hero-mobile.mp4`) que **se recorre con el scroll**, con el objeto 3D en vivo (three.js) encima, atenuado. La película se trae completa a memoria (blob) porque un servidor sin soporte de rangos no deja saltar dentro del archivo; mientras llega se ve el póster y el 3D a toda luz. Respeta `prefers-reduced-motion` y no se descarga con ahorro de datos o red lenta. `?estatico` apaga el 3D (para capturas) y `?nolenis` el scroll suave.
 
 Contacto: la constante `CONTACTO` (WhatsApp y correo) al inicio del script está vacía a propósito. En cuanto se definan, los botones aparecen solos en la sección de cierre.
 
