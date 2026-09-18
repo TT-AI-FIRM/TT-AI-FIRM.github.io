@@ -41,3 +41,21 @@ Espacio negativo: el objeto ocupa el centro-derecha; lado izquierdo limpio para 
 - Portada/OG 3:2 2k, 2 candidatas (gpt_image_2): 6.5 cr (solo hace falta si se publica dentro de Higgsfield).
 - Objeto 3D (image_to_3d): se cotiza con la imagen generada.
 Saldo al 18-sep: 2,978.5 cr (plan Ultra).
+
+---
+
+## HECHO Y PUBLICADO (18-sep-2026) · https://tt-ai-firm.github.io/
+Carlos eligió la **opción A** (sitio propio, visuales de Higgsfield cuando haga falta). Repo `TT-AI-FIRM/TT-AI-FIRM.github.io` (sitio de la cuenta, por eso queda en la raíz; los demos siguen en sus subcarpetas: `/all-cabo-demo/`, `/canta-corazon-demo/`, `/erp-ia-demo/`, `/tt-sistema/`).
+
+**Lo animado, sin gastar créditos todavía.** El hero es un objeto 3D **en vivo** hecho con three.js (no un video): seis anillos de metal oscuro con emisión teal→azul alrededor de un núcleo de icosaedro con malla; los anillos están inclinados y **se alinean conforme bajas** (el scroll es el control), la cámara se acerca, el campo de partículas se desplaza y el conjunto sigue al puntero. Respeta `prefers-reduced-motion` (pinta un cuadro fijo) y se apaga cuando el hero sale de pantalla.
+
+**Resto de la página:** cortina de carga con la marca, títulos que suben línea por línea, tarjetas con tilt 3D al pasar el mouse, contadores que suben (7 M · +500 · +25 · +30 · USD 28 M+ · 10,000+), la **Auditoría interactiva** (tres pestañas y 17 fugas; cada una abre su «cómo la medimos» y «con qué datos», textos exactos del pitch), la cadena «todo se conecta» con pulso recorriendo los 7 nodos, el riel de los 6 pasos que avanza con el scroll, equipo, para quién, por qué nosotros, «con quiénes hemos trabajado» y el cierre.
+
+**Reglas respetadas:** sin nombre de la fábrica, sin Ancla, sin nombrar el motor de generación («producimos con inteligencia artificial y dirección humana»), cifras declaradas marcadas como tales, los tres socios en el cierre.
+
+**Pendientes para Carlos**
+1. **Contacto**: la constante `CONTACTO` (WhatsApp y correo) está vacía en el script; en cuanto la dé, los botones aparecen solos en el cierre.
+2. **Demos**: el del ERP va con captura real; los de traslados y antro están como tarjetas «se muestra en la conversación» porque son de clientes. Si autoriza enlazarlos, se cambian por capturas y enlaces reales.
+3. **Película del hero** (lote de Higgsfield, ~27 créditos: storyboard 1 + Kling 3.0 pro 15 s 26.25): queda como capa opcional detrás del 3D; se coloca en `assets/hero.mp4` y se apunta con `data-src` en `<video id="film">`.
+4. **Dominio**: hoy `tt-ai-firm.github.io`. Cuando compre `ttaifirm.com`, se apunta con CNAME (ojo con [[hb-domain-cname-order]]: primero que resuelva el DNS).
+5. Precios: no van en la página (decisión del pitch: «precio fijo acreditable al proyecto»).
