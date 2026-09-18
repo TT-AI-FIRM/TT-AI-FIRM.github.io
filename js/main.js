@@ -5,6 +5,8 @@ import * as traslados from './muestras/traslados.js';
 import * as planta from './muestras/planta.js';
 import * as asistente from './muestras/asistente.js';
 import * as salon from './muestras/salon.js';
+import { montar as montarCotizador } from './cotizador/modulo.js';
+import { CONTACTO, enlaceWhatsApp, enlaceCorreo } from './contacto.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -30,9 +32,6 @@ const MAQUETAS = { traslados, planta, asistente, salon };
 // cada maqueta arranca a media historia para que nunca se vea vacía al cargar
 const DESFASE = { traslados: 6, planta: 9.5, asistente: 9, salon: 9 };
 const DESFASE_MINI = { traslados: 10.5, planta: 5, asistente: 12.5, salon: 4 };
-
-// Contacto: al llenarlo, los botones aparecen solos en el cierre.
-const CONTACTO = { whatsapp: '', correo: '' };
 
 /* ── palabra que cambia cada segundo ── */
 
@@ -170,13 +169,11 @@ function navegacion() {
 function contactoBotones() {
   const caja = $('#contactoBotones');
   if (!caja) return;
+  const wa = enlaceWhatsApp('Hola, quiero empezar una conversación con T.T AI Firm.');
+  const correo = enlaceCorreo('Conversación con T.T AI Firm', 'Hola, quiero empezar una conversación con T.T AI Firm.');
   const partes = [];
-  if (CONTACTO.whatsapp) {
-    const numero = CONTACTO.whatsapp.replace(/\D/g, '');
-    const texto = encodeURIComponent('Hola, quiero empezar con una conversación con T.T AI Firm.');
-    partes.push(`<a class="boton accion grande" href="https://wa.me/${numero}?text=${texto}" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>`);
-  }
-  if (CONTACTO.correo) partes.push(`<a class="boton linea grande" href="mailto:${CONTACTO.correo}">${CONTACTO.correo}</a>`);
+  if (wa) partes.push(`<a class="boton accion grande" href="${wa}" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>`);
+  if (correo) partes.push(`<a class="boton linea grande" href="${correo}">${CONTACTO.correo}</a>`);
   if (partes.length) caja.insertAdjacentHTML('afterbegin', partes.join(''));
 }
 
@@ -274,5 +271,6 @@ capacidades();
 apariciones();
 navegacion();
 contactoBotones();
+montarCotizador();
 maquetas();
 pelicula();
