@@ -1,7 +1,6 @@
 /* T.T AI Firm · la pantalla final de la auditoría y lo que se manda al sistema. */
 
 import { AUDITORIA, PREGUNTAS, CUANDO } from './datos.js';
-import { formularioHTML } from '../solicitud.js';
 
 const dolares = (n) => `${AUDITORIA.moneda} ${n.toLocaleString('en-US')}`;
 
@@ -44,18 +43,21 @@ export function paraElSistema(r) {
     quiere: l.duele.map(o => o.nombre),
     usuarios: l.tamano?.nombre ?? '',
     conexiones: l.digital ? [l.digital.nombre] : [],
+    mensaje: `Reunión: ${l.reunion?.nombre ?? 'sin preferencia'}`,
     resumen: resumen(r)
   };
+}
+
+/** El campo extra que la auditoría agrega a la ventana de contacto. */
+export function extraContacto() {
+  return `<label><span>¿Cuándo te acomoda?</span><select class="lista chica" name="plazo">${
+    CUANDO.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('')}</select></label>`;
 }
 
 export function pantalla(r) {
   const l = lectura(r);
   const marcas = [l.negocio, l.tamano, l.digital, l.reunion, ...l.duele]
     .filter(Boolean).map(o => `<span class="insignia">${o.nombre}</span>`).join('');
-
-  const cuando = `<label><span>¿Cuándo te acomoda?</span><select class="lista chica" name="plazo">${
-    CUANDO.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('')}</select></label>`;
-  const modo = `<input type="hidden" name="mensaje" value="Reunión: ${l.reunion?.nombre ?? 'sin preferencia'}">`;
 
   return `
     <div class="resultado">
@@ -75,13 +77,6 @@ export function pantalla(r) {
         <b>Todo se construye 1:1 sobre tu empresa.</b>
         <span>No vendemos licencias ni plantillas. Cada pantalla, cada regla y cada número se diseñan sobre tu forma de operar, hasta el último detalle. No existe una copia de tu sistema en ningún otro lado.</span>
       </div>
-
-      ${formularioHTML({
-        titulo: 'Pide tu auditoría',
-        ayuda: 'Tu solicitud entra directo a nuestro sistema, con todo lo que acabas de contestar.',
-        boton: 'Enviar mi solicitud',
-        extra: cuando + modo
-      })}
 
       <div class="marcas">${marcas}</div>
     </div>`;

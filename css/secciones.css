@@ -27,10 +27,17 @@
 .abanico .pieza:nth-child(2) { transform: scale(1.06); z-index: 2; }
 @media (max-width: 860px) { .abanico { grid-template-columns: 1fr; gap: 14px; } .abanico .pieza { transform: none !important; } .abanico .pieza:nth-child(3) { display: none; } }
 
-/* ── capacidades (fila de fichas) ── */
-.capacidades { display: flex; justify-content: center; gap: clamp(14px, 3vw, 44px); flex-wrap: wrap; position: relative; }
-.capacidades::before { content: ''; position: absolute; left: 6%; right: 6%; top: 29px; height: 1px; background: linear-gradient(90deg, transparent, var(--filo) 15%, var(--filo) 85%, transparent); z-index: -1; }
-@media (max-width: 720px) { .capacidades::before { display: none; } }
+/* ── capacidades: una cinta que desfila despacio con todo lo que hacemos ── */
+.capacidades { position: relative; overflow: hidden; }
+.capacidades::before { content: ''; position: absolute; left: 0; right: 0; top: 29px; height: 1px; background: linear-gradient(90deg, transparent, var(--filo) 15%, var(--filo) 85%, transparent); }
+.capacidades { mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.capacidades .cinta { display: flex; width: max-content; gap: clamp(20px, 3vw, 44px); animation: desfile var(--vuelta, 110s) linear infinite; }
+.capacidades:hover .cinta, .capacidades:focus-within .cinta { animation-play-state: paused; }
+.capacidades .ficha { width: 92px; flex: 0 0 92px; }
+@keyframes desfile { to { transform: translateX(calc(-50% - clamp(10px, 1.5vw, 22px))); } }
+@media (prefers-reduced-motion: reduce) {
+  .capacidades .cinta { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
+}
 
 /* ── oferta ── */
 .oferta { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 44px; }

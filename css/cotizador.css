@@ -143,3 +143,11 @@
 
 /* el desplegable chico que vive dentro del formulario */
 .pedir .lista.chica { margin-top: 0; padding: 12px 40px 12px 14px; font-size: 15px; background: var(--vidrio-2); background-position: right 13px center; background-size: 16px; }
+
+/* la ventana de contacto ocupa el cuerpo entero, y el aviso de que ya llegó */
+#cotizador .cuerpo > .pedir { margin-top: 0; background: none; box-shadow: none; padding: 0; }
+#cotizador .cuerpo > .pedir .encabezado b { font-size: clamp(20px, 2.4vw, 25px); line-height: 1.2; }
+#cotizador .cuerpo > .pedir .encabezado span { font-size: 14px; margin-top: 7px; }
+.llego { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; margin-bottom: 18px; border-radius: 12px; background: rgba(110, 231, 168, .12); box-shadow: inset 0 0 0 1px rgba(110, 231, 168, .4); }
+.llego b { font-family: var(--display); font-weight: 500; font-size: 16px; color: #8ff0bd; }
+.llego span { font-size: 13.5px; line-height: 1.5; color: var(--apagado); }

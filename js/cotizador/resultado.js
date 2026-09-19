@@ -4,7 +4,6 @@
 import { VALORES_CONFIRMADOS } from './datos.js';
 import { AUDITORIA } from '../auditoria/datos.js';
 import { pesos } from './precio.js';
-import { formularioHTML } from '../solicitud.js';
 
 const nombres = (lista) => lista.map(o => o.nombre).join(', ');
 const dolares = (n) => `${AUDITORIA.moneda} ${n.toLocaleString('en-US')}`;
@@ -67,12 +66,6 @@ export function pantalla(e) {
         <b>Todo se construye 1:1 sobre tu empresa.</b>
         <span>No vendemos licencias ni plantillas. Cada pantalla, cada regla y cada número se diseñan sobre tu forma de operar, hasta el último detalle. No existe una copia de tu sistema en ningún otro lado.</span>
       </div>
-
-      ${formularioHTML({
-        titulo: 'Pide este demo',
-        ayuda: 'Tu solicitud entra directo a nuestro sistema, con todo lo que acabas de elegir.',
-        boton: 'Enviar mi solicitud'
-      })}
 
       <div class="marcas">${marcas}</div>
     </div>`;

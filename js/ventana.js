@@ -5,7 +5,7 @@
 import { DEMO } from './cotizador/cuestionario.js';
 import { AUDITORIA_Q } from './auditoria/cuestionario.js';
 import { puertasHTML } from './puertas.js';
-import { conectar } from './solicitud.js';
+import { formularioHTML, conectar } from './solicitud.js';
 
 const TIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 const FLECHA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -18,6 +18,7 @@ let caja, panel, cuerpo, pie, barra, cuenta, titulo;
 let cuestionario = null;   // null = la pantalla de las dos puertas
 let paso = 0;
 let respuestas = {};
+let ultimo = null;         // lo que se va a enseñar y a mandar, ya calculado
 
 /* ── cascarón ── */
 
@@ -82,13 +83,15 @@ function pintar() {
     return;
   }
 
-  const total = cuestionario.preguntas.length;
-  const enFinal = paso >= total;
+  const preguntas = cuestionario.preguntas.length;
+  const total = preguntas + 1;               // las preguntas más la ventana de contacto
   titulo.textContent = cuestionario.titulo;
-  barra.style.width = `${((enFinal ? total : paso + 1) / total) * 100}%`;
-  cuenta.textContent = enFinal ? 'Tu resultado' : `Paso ${paso + 1} de ${total}`;
 
-  if (enFinal) return pintarFinal();
+  if (paso > preguntas) { barra.style.width = '100%'; cuenta.textContent = 'Tu resultado'; return pintarFinal(); }
+
+  barra.style.width = `${((paso + 1) / total) * 100}%`;
+  cuenta.textContent = `Paso ${paso + 1} de ${total}`;
+  if (paso === preguntas) return pintarPedir();
 
   const p = pregunta();
   const r = respuestas[p.id];
@@ -112,15 +115,22 @@ function pintar() {
     <button class="boton accion" data-siguiente ${contestada() ? '' : 'disabled'}>${ultimo ? 'Ver mi resultado' : 'Siguiente'}${FLECHA}</button>`;
 }
 
-function pintarFinal() {
-  const final = cuestionario.final(respuestas);
-  if (!final) { paso = Math.max(0, cuestionario.preguntas.length - 4); return pintar(); }
+// La ventana de contacto: es lo último antes de terminar.
+function pintarPedir() {
+  ultimo = cuestionario.final(respuestas);
+  if (!ultimo) { paso = 0; return pintar(); }
 
-  cuerpo.innerHTML = final.html;
+  cuerpo.innerHTML = formularioHTML(cuestionario.pide);
+  pie.innerHTML = '<button class="boton linea" data-atras>Atrás</button>';
+  conectar(cuerpo.querySelector('[data-pedir]'), () => ultimo.sistema, () => { paso += 1; pintar(); });
+}
+
+function pintarFinal() {
+  const final = ultimo ?? cuestionario.final(respuestas);
+  cuerpo.innerHTML = '<div class="llego"><b>Listo, ya llegó.</b><span>Tu solicitud entró a nuestro sistema. Te buscamos por teléfono o por correo.</span></div>' + final.html;
   pie.innerHTML = '<button class="boton linea" data-reiniciar>Empezar de nuevo</button>' +
                   '<button class="boton linea" data-copiar>Copiar mi resumen</button>';
   pie.dataset.texto = final.texto;
-  conectar(cuerpo.querySelector('[data-pedir]'), () => final.sistema);
 }
 
 /* ── manos ── */
@@ -150,20 +160,22 @@ function alTocarPie(e) {
     paso -= 1; pintar();
   }
   else if (e.target.closest('[data-siguiente]')) avanzar();
-  else if (e.target.closest('[data-reiniciar]')) { respuestas = vacias(cuestionario.preguntas); paso = 0; pintar(); }
+  else if (e.target.closest('[data-reiniciar]')) { respuestas = vacias(cuestionario.preguntas); ultimo = null; paso = 0; pintar(); }
   else if (e.target.closest('[data-copiar]')) copiar(e.target.closest('[data-copiar]'));
 }
 
 function elegir(cual) {
   cuestionario = CUESTIONARIOS[cual];
   respuestas = vacias(cuestionario.preguntas);
+  ultimo = null;
   paso = 0;
   pintar();
 }
 
 function avanzar() {
-  if (paso < cuestionario.preguntas.length && !contestada()) return;
-  paso = Math.min(cuestionario.preguntas.length, paso + 1);
+  if (paso >= cuestionario.preguntas.length) return;   // de la ventana de contacto solo sale enviando
+  if (!contestada()) return;
+  paso += 1;
   pintar();
 }
 

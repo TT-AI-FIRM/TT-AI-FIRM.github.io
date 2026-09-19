@@ -1,15 +1,17 @@
-/* Maqueta: planta. La producción del turno crece hora por hora contra el programa,
-   entra un paro con su causa y la capacitación avanza. Ciclo de 16 segundos. */
+/* Maqueta: fábrica. Es un sistema integral: la producción del turno crece contra el programa,
+   entra un paro con su causa, la capacitación avanza y abajo se ven las áreas que van conectadas.
+   Ciclo de 16 segundos. */
 
 import { el, lienzo, panel, texto, encabezado, ciclo, suave, tramo, miles, COLOR } from './comun.js';
 
 const DURACION = 16;
 const HORAS = [62, 78, 71, 86, 94, 88, 97, 91];
 const META_TURNO = 3200;
+const AREAS = ['Producción', 'Laboratorio', 'Almacén', 'Mantenimiento', 'Costos', 'Capacitación'];
 
 export function montar(nodo) {
   const svg = lienzo(nodo);
-  encabezado(svg, 'Planta · turno de hoy');
+  encabezado(svg, 'Fábrica · sistema integral');
 
   // kilos del turno
   svg.appendChild(texto(12, 34, 'KILOS DEL TURNO', { tam: 4.8, color: COLOR.tenue, mono: true, espaciado: .9 }));
@@ -63,9 +65,28 @@ export function montar(nodo) {
   const evaluados = texto(180, 154, '0 de 42 operadores', { tam: 5, color: COLOR.tenue, mono: true });
   svg.appendChild(evaluados);
 
+  // las áreas que ya viven dentro del sistema
+  svg.appendChild(panel(10, 162, 300, 30, { rx: 6 }));
+  const areas = AREAS.map((nombre, i) => {
+    const x = 16 + i * 49;
+    const caja = el('rect', { x, y: 169, width: 46, height: 16, rx: 4, fill: 'rgba(186,215,247,.06)', stroke: COLOR.filo, 'stroke-width': 1 });
+    const letra = texto(x + 23, 179.5, nombre, { tam: 4.6, color: COLOR.tenue, anclaje: 'middle' });
+    svg.appendChild(caja); svg.appendChild(letra);
+    return { caja, letra };
+  });
+
   return {
     paso(t) {
       const p = ciclo(t, DURACION);
+
+      // una por una se van encendiendo, para que se vea que es un solo sistema
+      const encendida = Math.floor(t / 1.7) % AREAS.length;
+      areas.forEach((a, i) => {
+        const on = i === encendida;
+        a.caja.setAttribute('fill', on ? 'rgba(139,107,255,.22)' : 'rgba(186,215,247,.06)');
+        a.caja.setAttribute('stroke', on ? 'rgba(139,107,255,.6)' : COLOR.filo);
+        a.letra.setAttribute('fill', on ? COLOR.titulo : COLOR.tenue);
+      });
 
       // las barras se llenan una tras otra
       let acumulado = 0;
