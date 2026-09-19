@@ -40,7 +40,7 @@
     <a href="#equipo" data-ir>Quiénes somos</a>
   </nav>
   <div class="derecha">
-    <a class="boton accion" href="#contacto" data-ir>Empezar<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <button class="boton accion" data-modulo="puertas">Empezar<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     <button class="hamburguesa" id="btnMenu" aria-label="Abrir menú"><i></i><i></i></button>
   </div>
 </header>
@@ -62,8 +62,7 @@
     <p class="parrafo bajada ap" style="--dl:320ms">Encontramos dónde se pierde el dinero, <b>construimos lo que lo recupera</b> y lo dejamos corriendo. Con seguimiento mensual y con pruebas.</p>
 
     <div class="acciones ap" style="--dl:420ms">
-      <a class="boton accion grande" href="#contacto" data-ir>Empezar con una conversación<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a class="boton linea grande" href="#muestras" data-ir>Ver los sistemas corriendo</a>
+      <button class="boton accion grande" data-modulo="puertas">Empezar con mi empresa<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </div>
 
     <div class="abanico ap" style="--dl:560ms" aria-hidden="true">
@@ -86,6 +85,19 @@
       <article class="vidrio viva ap" style="--dl:120ms"><span class="paso">Construir</span><h3>Sistemas y programas a la medida</h3><p>Software propio para el proceso de cada empresa. Del CRM al piso de planta, del tablero de dirección al cierre de mes. Sin licencias ni plantillas: se diseña 1:1 sobre una sola operación, la suya.</p><span class="pie">En producción desde las primeras semanas</span></article>
       <article class="vidrio viva ap" style="--dl:240ms"><span class="paso">Sostener</span><h3>Profit Engineering mensual</h3><p>Tablero vivo, revisión con dirección y desempeño del equipo. Un sistema que nadie revisa se muere en tres meses.</p><span class="pie">Cada mes, con la sección honesta de lo que falta</span></article>
     </div>
+
+    <article class="vidrio ap propia" style="--dl:340ms">
+      <div>
+        <p class="etiqueta izquierda">Inteligencia artificial propia</p>
+        <h3>Una IA dedicada solo a los datos de tu empresa</h3>
+        <p>Desarrollamos inteligencia artificial personalizada para uso corporativo o personal: un asistente que trabaja únicamente sobre la información de tu negocio, con permisos por nivel y respuestas que salen de tus propios datos. No es un chat genérico ni una suscripción compartida.</p>
+      </div>
+      <div class="tres">
+        <div><b>Analiza</b><span>Lee tu operación completa, incluidos los documentos y los históricos que nadie vuelve a abrir.</span></div>
+        <div><b>Responde</b><span>Contesta preguntas del negocio en español, con el número y de dónde salió.</span></div>
+        <div><b>Anticipa</b><span>Avisa lo que viene: demanda, cobranza, inventario, paros y clientes que se están enfriando.</span></div>
+      </div>
+    </article>
   </section>
 
   <section class="bloque envoltura" id="muestras">
@@ -95,12 +107,11 @@
 
     <div class="muestras">
       <article class="vidrio muestra ap">
-        <div class="barra"><i></i><i></i><i></i><span>central de operaciones · flota en vivo</span></div>
+        <div class="barra"><i></i><i></i><i></i><span>app del huésped y central · flota en vivo</span></div>
         <div class="marco" data-maqueta="traslados"></div>
         <div class="pie">
-          <div class="fila"><h3>Traslados de lujo</h3><span class="insignia viva"><i></i>en vivo</span></div>
+          <div class="fila"><h3>App para transporte de lujo</h3><span class="insignia viva"><i></i>en operación</span></div>
           <p>El huésped reserva y paga desde su teléfono, el viaje llega al chofer más cercano y la central ve cada camioneta, su combustible y su ruta. Propias y aliadas.</p>
-          <a class="enlace" href="https://tt-ai-firm.github.io/all-cabo-demo/" target="_blank" rel="noopener">Abrir el sistema<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
       </article>
 
@@ -108,32 +119,49 @@
         <div class="barra"><i></i><i></i><i></i><span>planta · producción y capacitación</span></div>
         <div class="marco" data-maqueta="planta"></div>
         <div class="pie">
-          <div class="fila"><h3>Manufactura a gran escala</h3><span class="insignia"><i></i>en producción</span></div>
+          <div class="fila"><h3>Sistema integral para fábrica</h3><span class="insignia viva"><i></i>en operación</span></div>
           <p>Producción por turno contra el programa, paros con su causa, y capacitación con personaje y audio para personal operativo. Más de 500 usuarios de piso y oficina.</p>
-          <span class="ayuda">Sistema de un cliente en operación. Se muestra completo en la conversación.</span>
         </div>
       </article>
 
       <article class="vidrio muestra ap" style="--dl:240ms">
-        <div class="barra"><i></i><i></i><i></i><span>erp · asistente de inteligencia artificial</span></div>
+        <div class="barra"><i></i><i></i><i></i><span>erp · inteligencia artificial integrada</span></div>
         <div class="marco" data-maqueta="asistente"></div>
         <div class="pie">
-          <div class="fila"><h3>ERP con asistente propio</h3><span class="insignia viva"><i></i>en vivo</span></div>
+          <div class="fila"><h3>ERP con IA integrado</h3><span class="insignia viva"><i></i>en operación</span></div>
           <p>Ventas, compras, inventario y finanzas en una sola base, y un asistente que conoce el negocio entero: contesta, analiza y encuentra lo que nadie buscó.</p>
-          <a class="enlace" href="https://tt-ai-firm.github.io/erp-ia-demo/" target="_blank" rel="noopener">Abrir el sistema<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
       </article>
 
       <article class="vidrio muestra ap" style="--dl:360ms">
-        <div class="barra"><i></i><i></i><i></i><span>salón · puerta, mesas y caja</span></div>
+        <div class="barra"><i></i><i></i><i></i><span>club y restaurante · puerta, mesas y caja</span></div>
         <div class="marco" data-maqueta="salon"></div>
         <div class="pie">
-          <div class="fila"><h3>Salón y vida nocturna</h3><span class="insignia viva"><i></i>en vivo</span></div>
+          <div class="fila"><h3>Sistema para club y restaurante</h3><span class="insignia viva"><i></i>en operación</span></div>
           <p>El cliente aparta su mesa en el plano y paga; en la puerta se escanea su código y entra. Mesas, pedidos, inventario y caja, dos sucursales sobre una base.</p>
-          <a class="enlace" href="https://tt-ai-firm.github.io/canta-corazon-demo/" target="_blank" rel="noopener">Abrir el sistema<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </article>
+
+      <article class="vidrio muestra ap" style="--dl:480ms">
+        <div class="barra"><i></i><i></i><i></i><span>distribución · surtido y rutas</span></div>
+        <div class="marco" data-maqueta="distribucion"></div>
+        <div class="pie">
+          <div class="fila"><h3>Sistema de distribución</h3><span class="insignia">ejemplo</span></div>
+          <p>Pedidos surtidos en piso, inventario que se descuenta solo, rutas que salen con su carga y entregas medidas contra lo prometido. Del almacén a la puerta del cliente en una sola pantalla.</p>
+        </div>
+      </article>
+
+      <article class="vidrio muestra ap" style="--dl:600ms">
+        <div class="barra"><i></i><i></i><i></i><span>campaña · embudo y leads</span></div>
+        <div class="marco" data-maqueta="campana"></div>
+        <div class="pie">
+          <div class="fila"><h3>Sistema de campaña de marketing y leads</h3><span class="insignia">ejemplo</span></div>
+          <p>Cuánto se invirtió, cuánta gente entró, cuántos dejaron sus datos y cuántos agendaron. Cada lead con su origen y su seguimiento, para que ninguno se enfríe.</p>
         </div>
       </article>
     </div>
+
+    <p class="ayuda ap" style="text-align:center;margin-top:20px;max-width:66ch;margin-inline:auto">Los que dicen «en operación» corren hoy con clientes y no se publican por respeto a cada empresa: los enseñamos completos, en vivo, en la conversación. Los demás son ejemplos de lo que construimos a la medida.</p>
   </section>
 
   <section class="bloque envoltura" id="demo">
@@ -144,7 +172,7 @@
       <div class="ap">
         <p class="parrafo">Contesta cinco preguntas y te decimos qué te construiríamos, en cuánto tiempo y con qué orden de inversión. El alcance firme sale después, de la auditoría, porque se define sobre tu operación y no sobre un catálogo.</p>
         <p class="parrafo" style="margin-top:14px">Trabajamos 1:1: <b>ninguna otra empresa tendrá tu sistema</b>, porque se diseña sobre tu forma de operar hasta el último detalle.</p>
-        <button class="boton accion grande" data-cotizador>Armar mi demo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="boton accion grande" data-modulo="demo">Armar mi demo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         <span class="pista">5 preguntas · menos de un minuto · sin compromiso</span>
       </div>
 
@@ -219,12 +247,24 @@
   <section class="bloque envoltura" id="contacto">
     <div class="cierre ap">
       <p class="etiqueta">Cómo empezar</p>
-      <h2 class="despliegue" style="max-width:14ch;margin-inline:auto">Tres pasos. Los dos primeros no cuestan nada.</h2>
-      <div class="pasos">
-        <div><span class="k">45 minutos</span><b>Conversación con dirección</b><span>Cómo opera la empresa, cómo vende, qué datos existen y quién decide.</span></div>
-        <div><span class="k">Sin costo</span><b>Una muestra, no una lámina</b><span>Con información pública construimos una primera pantalla y la enseñamos.</span></div>
-        <div><span class="k">Desde USD 3,500</span><b>Auditoría de Performance intensiva</b><span>Dos semanas dentro de la operación. Alcance y condiciones por escrito, y el monto se acredita al proyecto.</span></div>
+      <h2 class="despliegue" style="max-width:15ch;margin-inline:auto">El primer paso es la auditoría.</h2>
+      <p class="parrafo" style="margin:18px auto 0;max-width:58ch">Nada sale de un catálogo. Entramos a tu operación, la medimos, y de ahí sale lo que se construye. Si prefieres verlo antes de decidir, te hacemos un demo a la medida de tu negocio, con su propio precio.</p>
+      <div class="pasos dos">
+        <div>
+          <span class="k">Desde USD 3,500</span>
+          <b>Auditoría de Performance intensiva</b>
+          <span>Dos semanas dentro de la operación. Sale con números dónde se pierde dinero hoy, todo lo que puede mejorar con sistemas y digitalización, y el alcance y el precio firmes de lo que se va a construir. El monto se acredita al proyecto.</span>
+          <button class="boton accion" data-modulo="auditoria">Pedir mi auditoría<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+        <div>
+          <span class="k">Con precio según el alcance</span>
+          <b>Demo a la medida de tu negocio</b>
+          <span>Una muestra real de tu sistema, hecha sobre tu operación, antes de comprometer el proyecto completo. Ármalo en cinco preguntas y te decimos qué lleva y qué cuesta.</span>
+          <button class="boton linea" data-modulo="demo">Armar mi demo<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
       </div>
+      <div id="cierreForma"></div>
+
       <div class="firmas" id="contactoBotones">
         <span class="insignia"><i></i>Alberto Navarro</span><span class="insignia"><i></i>Carlos Martínez</span><span class="insignia"><i></i>Franco Sánchez</span>
       </div>
@@ -238,13 +278,13 @@
         <p>Auditoría, sistemas y programas a la medida, conectados en una sola plataforma y revisados cada mes con dirección. Producimos con inteligencia artificial y dirección humana.</p>
       </div>
       <nav aria-label="Secciones"><h4>Secciones</h4><ul><li><a href="#ofrecemos" data-ir>Qué ofrecemos</a></li><li><a href="#muestras" data-ir>Los sistemas</a></li><li><a href="#demo" data-ir>Tu demo</a></li><li><a href="#pruebas" data-ir>Experiencia</a></li><li><a href="#equipo" data-ir>Quiénes somos</a></li></ul></nav>
-      <nav aria-label="Sistemas"><h4>Sistemas</h4><ul><li><a href="https://tt-ai-firm.github.io/all-cabo-demo/" target="_blank" rel="noopener">Traslados de lujo</a></li><li><a href="https://tt-ai-firm.github.io/erp-ia-demo/" target="_blank" rel="noopener">ERP con asistente</a></li><li><a href="https://tt-ai-firm.github.io/canta-corazon-demo/" target="_blank" rel="noopener">Salón y vida nocturna</a></li></ul></nav>
+      <nav aria-label="Qué construimos"><h4>Qué construimos</h4><ul><li>Sistemas internos y bases de datos</li><li>Apps, portales y punto de venta</li><li>IA propietaria y tableros</li><li>Campaña de marketing, leads y CRM</li></ul></nav>
     </div>
-    <div class="franja"><span>© 2026 T.T AI Firm · México</span><span>Alberto Navarro · Carlos Martínez · Franco Sánchez</span></div>
+    <div class="franja"><span>© 2026 T.T AI Firm · México</span><span>Profit Engineering</span></div>
   </footer>
 </main>
 
-<div class="zocalo" id="zocalo"><a class="boton accion" href="#contacto" data-ir>Empezar con una conversación<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+<div class="zocalo" id="zocalo"><button class="boton accion" data-modulo="puertas">Empezar con mi empresa<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
 
 <div id="menu" aria-hidden="true">
   <div class="fondo" data-cerrar-menu></div>

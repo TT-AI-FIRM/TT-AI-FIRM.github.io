@@ -1,9 +1,10 @@
 /* T.T AI Firm · la pantalla final del cotizador y el resumen que se envía.
    El protagonista es la auditoría: el estimado es apenas el orden de magnitud. */
 
-import { AUDITORIA, VALORES_CONFIRMADOS } from './datos.js';
+import { VALORES_CONFIRMADOS } from './datos.js';
+import { AUDITORIA } from '../auditoria/datos.js';
 import { pesos } from './precio.js';
-import { enlaceWhatsApp, enlaceCorreo } from '../contacto.js';
+import { formularioHTML } from '../solicitud.js';
 
 const nombres = (lista) => lista.map(o => o.nombre).join(', ');
 const dolares = (n) => `${AUDITORIA.moneda} ${n.toLocaleString('en-US')}`;
@@ -67,20 +68,35 @@ export function pantalla(e) {
         <span>No vendemos licencias ni plantillas. Cada pantalla, cada regla y cada número se diseñan sobre tu forma de operar, hasta el último detalle. No existe una copia de tu sistema en ningún otro lado.</span>
       </div>
 
+      ${formularioHTML({
+        titulo: 'Pide este demo',
+        ayuda: 'Tu solicitud entra directo a nuestro sistema, con todo lo que acabas de elegir.',
+        boton: 'Enviar mi solicitud'
+      })}
+
       <div class="marcas">${marcas}</div>
     </div>`;
 }
 
-/** Botones del pie en la pantalla final. Los de contacto aparecen solos al llenar contacto.js */
-export function acciones(e) {
-  const texto = resumen(e);
-  const wa = enlaceWhatsApp(texto);
-  const correo = enlaceCorreo('Solicitud de demo · T.T AI Firm', texto);
-  const partes = ['<button class="boton linea" data-reiniciar>Empezar de nuevo</button>'];
+/** Lo que se manda al sistema junto con los campos del formulario. */
+export function paraElSistema(e) {
+  return {
+    tipo: 'demo',
+    giro: e.negocio?.nombre ?? '',
+    quiere: e.modulos.map(m => m.nombre),
+    usuarios: e.usuarios?.nombre ?? '',
+    conexiones: e.conexiones.map(c => c.nombre),
+    plazo: e.plazo?.nombre ?? '',
+    estimado_desde: e.desde,
+    estimado_hasta: e.hasta,
+    estimado_mensual: e.mensual,
+    semanas: e.semanas,
+    resumen: resumen(e)
+  };
+}
 
-  if (wa) partes.push(`<a class="boton accion" href="${wa}" target="_blank" rel="noopener">Enviar por WhatsApp</a>`);
-  else if (correo) partes.push(`<a class="boton accion" href="${correo}">Enviar por correo</a>`);
-  else partes.push('<button class="boton accion" data-copiar>Copiar mi resumen</button>');
-
-  return partes.join('');
+/** Botones del pie en la pantalla final. Enviar se hace en el formulario, aquí arriba. */
+export function acciones() {
+  return '<button class="boton linea" data-reiniciar>Empezar de nuevo</button>' +
+         '<button class="boton linea" data-copiar>Copiar mi resumen</button>';
 }

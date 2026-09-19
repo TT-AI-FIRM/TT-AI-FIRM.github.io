@@ -2,6 +2,8 @@
    Carlos cambia aquí los números y la página entera se recalcula sola.
    Mientras VALORES_CONFIRMADOS sea false, el resultado se marca como ejemplo. */
 
+import { GIROS } from '../giros.js';
+
 export const VALORES_CONFIRMADOS = false;
 
 /* ── las cinco preguntas ──
@@ -18,21 +20,7 @@ export const PREGUNTAS = [
     ayuda: 'Nos dice con qué operación nos vamos a encontrar.',
     tipo: 'lista',
     vacio: 'Elige tu giro…',
-    opciones: [
-      { id: 'fabrica',      nombre: 'Fábrica o manufactura',            factor: 1.18 },
-      { id: 'distribucion', nombre: 'Distribución y logística',         factor: 1.12 },
-      { id: 'tienda',       nombre: 'Tienda o cadena de tiendas',       factor: 1.08 },
-      { id: 'transporte',   nombre: 'Transporte y flota',               factor: 1.12 },
-      { id: 'restaurante',  nombre: 'Restaurante, bar o entretenimiento', factor: 1.05 },
-      { id: 'hotel',        nombre: 'Hotel y hospitalidad',             factor: 1.08 },
-      { id: 'salud',        nombre: 'Salud y clínicas',                 factor: 1.15 },
-      { id: 'construccion', nombre: 'Construcción e inmobiliaria',      factor: 1.10 },
-      { id: 'servicios',    nombre: 'Servicios profesionales',          factor: 1.00 },
-      { id: 'linea',        nombre: 'Comercio en línea',                factor: 1.05 },
-      { id: 'educacion',    nombre: 'Educación y capacitación',         factor: 1.00 },
-      { id: 'agro',         nombre: 'Agroindustria',                    factor: 1.12 },
-      { id: 'otro',         nombre: 'Otro giro',                        factor: 1.05 }
-    ]
+    opciones: GIROS
   },
   {
     id: 'modulos',
@@ -50,7 +38,8 @@ export const PREGUNTAS = [
       { id: 'punto',         nombre: 'Punto de venta y cobro',       nota: 'Caja, pedidos e inventario', precio: 180000, semanas: 5 },
       { id: 'web',           nombre: 'Página web high end',          nota: 'La cara pública de la marca', precio: 120000, semanas: 4 },
       { id: 'animacion',     nombre: 'Animaciones 3D y video',       nota: 'Producto y marca en movimiento', precio: 90000,  semanas: 3 },
-      { id: 'campana',       nombre: 'Campaña y adquisición',        nota: 'Traer clientes y medirlos', precio: 110000, semanas: 3 },
+      { id: 'campana',       nombre: 'Campaña de marketing',         nota: 'Traer clientes y medirlos', precio: 110000, semanas: 3 },
+      { id: 'crm',           nombre: 'CRM y seguimiento de leads',   nota: 'Que ningún cliente se enfríe', precio: 150000, semanas: 5 },
       { id: 'capacitacion',  nombre: 'Capacitación del personal',    nota: 'Con evaluación y seguimiento', precio: 140000, semanas: 5 }
     ]
   },
@@ -106,21 +95,4 @@ export const PRECIO = {
   mensualMinimo: 18000,
   trabajoEnParalelo: 0.45,     // los módulos que no son el más largo cuentan 45%
   holguraSemanas: 3
-};
-
-/* ── la auditoría: el paso real que sigue ──
-   Valor confirmado por dirección. La auditoría intensiva es la que define,
-   sobre la operación real, qué se construye y cuánto cuesta de verdad. */
-
-export const AUDITORIA = {
-  nombre: 'Auditoría de Performance intensiva',
-  desde: 3500,
-  moneda: 'USD',
-  duracion: 'Dos semanas',
-  acreditable: true,
-  entrega: [
-    'Dónde se pierde dinero hoy, en pesos y con su causa',
-    'Qué se puede mejorar con sistemas y digitalización, priorizado por retorno',
-    'El alcance, el orden y el precio firme de lo que se va a construir'
-  ]
 };

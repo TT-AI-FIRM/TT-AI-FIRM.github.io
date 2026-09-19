@@ -95,3 +95,51 @@
   #cotizador footer .boton { flex: 1; justify-content: center; }
   .auditoria .precio { text-align: left; }
 }
+
+/* ── formulario de solicitud (resultado del módulo y cierre) ── */
+.pedir { margin-top: 20px; padding: 18px 20px; border-radius: 14px; background: var(--vidrio); box-shadow: inset 0 0 0 1px var(--filo); text-align: left; }
+.pedir .encabezado b { display: block; font-family: var(--display); font-weight: 500; font-size: 16px; color: var(--titulo); }
+.pedir .encabezado span { display: block; font-size: 13px; color: var(--tenue); margin-top: 4px; line-height: 1.45; }
+.pedir .campos { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+@media (min-width: 620px) { .pedir .campos { grid-template-columns: 1fr 1fr; } .pedir .campos .ancho { grid-column: 1 / -1; } }
+.pedir label span { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--tenue); margin-bottom: 6px; }
+.pedir input, .pedir textarea {
+  width: 100%; padding: 12px 14px; border: 0; border-radius: 11px; font: inherit; font-size: 15px;
+  color: var(--titulo); background: var(--vidrio-2); box-shadow: inset 0 0 0 1px var(--filo);
+  transition: box-shadow .2s ease, background-color .2s ease;
+}
+.pedir textarea { resize: vertical; min-height: 78px; line-height: 1.45; }
+.pedir input::placeholder, .pedir textarea::placeholder { color: var(--tenue); }
+.pedir input:focus, .pedir textarea:focus { outline: none; background: var(--vidrio-3); box-shadow: inset 0 0 0 1px rgba(139, 107, 255, .6); }
+.pedir .trampa { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.pedir .abajo { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+.pedir .aviso { font-size: 13px; line-height: 1.45; color: var(--tenue); margin: 0; }
+.pedir .aviso.malo { color: #e6bc7c; }
+.pedir button[disabled] { opacity: .55; pointer-events: none; }
+.pedir .listo b { display: block; font-family: var(--display); font-weight: 500; font-size: 17px; color: var(--titulo); }
+.pedir .listo span { display: block; font-size: 14px; color: var(--apagado); margin-top: 6px; line-height: 1.5; }
+
+/* en el cierre la tarjeta va sobre fondo oscuro y con su propio aire */
+.cierre .pedir { margin-top: 28px; background: var(--vidrio-2); }
+.cierre .pedir .encabezado { text-align: center; }
+@media (min-width: 620px) { .cierre .pedir .abajo { justify-content: center; } }
+@media (max-width: 620px) { .pedir .abajo .boton { width: 100%; justify-content: center; } }
+
+/* ── las dos puertas: primera pantalla de la ventana ── */
+.puertas .titulo { font-size: clamp(21px, 2.6vw, 27px); line-height: 1.2; margin-top: 4px; }
+.puerta {
+  display: block; width: 100%; text-align: left; margin-top: 14px;
+  padding: 18px 20px; border-radius: 14px;
+  background: var(--vidrio); box-shadow: inset 0 0 0 1px var(--filo);
+  transition: background-color .22s ease, box-shadow .22s ease, transform .22s var(--curva-suave);
+}
+.puerta:hover { background: rgba(102, 58, 243, .13); box-shadow: inset 0 0 0 1px rgba(139, 107, 255, .45); transform: translateY(-2px); }
+.puerta .k { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--tenue); }
+.puerta b { display: block; font-family: var(--display); font-weight: 500; font-size: 19px; color: var(--titulo); margin-top: 5px; line-height: 1.22; }
+.puerta .d { display: block; font-size: 13.5px; line-height: 1.5; color: var(--apagado); margin-top: 8px; }
+.puerta .ir { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; font-size: 13px; font-weight: 500; color: var(--azul); }
+.puerta .ir svg { width: 14px; height: 14px; transition: transform .26s var(--curva-suave); }
+.puerta:hover .ir svg { transform: translateX(4px); }
+
+/* el desplegable chico que vive dentro del formulario */
+.pedir .lista.chica { margin-top: 0; padding: 12px 40px 12px 14px; font-size: 15px; background: var(--vidrio-2); background-position: right 13px center; background-size: 16px; }

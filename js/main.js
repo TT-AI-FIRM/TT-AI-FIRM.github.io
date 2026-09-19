@@ -5,8 +5,11 @@ import * as traslados from './muestras/traslados.js';
 import * as planta from './muestras/planta.js';
 import * as asistente from './muestras/asistente.js';
 import * as salon from './muestras/salon.js';
-import { montar as montarCotizador } from './cotizador/modulo.js';
+import * as distribucion from './muestras/distribucion.js';
+import * as campana from './muestras/campana.js';
+import { montar as montarVentana } from './ventana.js';
 import { CONTACTO, enlaceWhatsApp, enlaceCorreo } from './contacto.js';
+import { formularioHTML, conectar } from './solicitud.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -15,22 +18,27 @@ const menosMovimiento = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ── datos de la página ── */
 
-const PALABRAS = ['Sistema', 'Campaña', 'App', 'IA propietaria', 'Página web high end', 'Animaciones 3D', 'Base de datos', 'Automatización'];
+const PASO_PALABRA = 1700;   // lo que dura cada palabra de la portada, y el paso de las fichas
+const PALABRAS = ['Sistema', 'Campaña de marketing', 'App', 'IA propietaria', 'Página web high end',
+  'Animaciones 3D', 'Base de datos', 'Automatización', 'Leads', 'CRM', 'Todo 1 de 1'];
+const DURACION_PALABRA = { 'Todo 1 de 1': 2500 };   // la que cierra el ciclo se queda más tiempo
 
 const CAPACIDADES = [
-  ['Campaña', 'M4 19V9m6 10V5m6 14v-7'],
+  ['Campaña de marketing', 'M4 19V9m6 10V5m6 14v-7'],
   ['App', 'M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM11 18h2'],
   ['IA propietaria', 'M12 3l1.9 5.4L19 10l-5.1 1.6L12 17l-1.9-5.4L5 10l5.1-1.6zM18.5 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z'],
   ['Página web', 'M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 9h18M7 6.5h.01'],
   ['Animaciones 3D', 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9'],
   ['Base de datos', 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3'],
-  ['Automatización', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.7l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 14h-.1a2 2 0 1 1 0-4H3a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 10h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1z']
+  ['Automatización', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.7l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 14h-.1a2 2 0 1 1 0-4H3a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 10h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1z'],
+  ['Leads', 'M3 5h18l-7 8.2V21l-4-2.4v-5.4z'],
+  ['CRM', 'M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-6A3.5 3.5 0 0 0 3 17.5V19M9.5 10.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21 19v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 3.7a3.5 3.5 0 0 1 0 6.8']
 ];
 
-const MAQUETAS = { traslados, planta, asistente, salon };
+const MAQUETAS = { traslados, planta, asistente, salon, distribucion, campana };
 
 // cada maqueta arranca a media historia para que nunca se vea vacía al cargar
-const DESFASE = { traslados: 6, planta: 9.5, asistente: 9, salon: 9 };
+const DESFASE = { traslados: 6, planta: 9.5, asistente: 9, salon: 9, distribucion: 7.5, campana: 8.5 };
 const DESFASE_MINI = { traslados: 10.5, planta: 5, asistente: 12.5, salon: 4 };
 
 /* ── palabra que cambia cada segundo ── */
@@ -50,13 +58,17 @@ function rotador() {
   if (menosMovimiento) return;
 
   let actual = 0;
-  setInterval(() => {
+  const dura = (i) => DURACION_PALABRA[PALABRAS[i]] ?? PASO_PALABRA;
+
+  const siguiente = () => {
     const saliendo = nodos[actual];
     actual = (actual + 1) % nodos.length;
     saliendo.classList.replace('activa', 'saliendo');
     nodos[actual].classList.add('activa');
     setTimeout(() => saliendo.classList.remove('saliendo'), 600);
-  }, 1000);
+    setTimeout(siguiente, dura(actual));
+  };
+  setTimeout(siguiente, dura(0));
 }
 
 /* ── fila de capacidades ── */
@@ -79,7 +91,7 @@ function capacidades() {
   setInterval(() => {
     fichas.forEach((f, k) => f.classList.toggle('encendida', k === i));
     i = (i + 1) % fichas.length;
-  }, 1000);
+  }, PASO_PALABRA);
 }
 
 /* ── apariciones al entrar en pantalla ── */
@@ -165,6 +177,19 @@ function navegacion() {
 }
 
 /* ── contacto ── */
+
+// El formulario del cierre: lo que se escriba aquí entra al sistema de T.T.
+function contactoForma() {
+  const caja = $('#cierreForma');
+  if (!caja) return;
+  caja.innerHTML = formularioHTML({
+    titulo: '¿Prefieres que te busquemos?',
+    ayuda: 'Déjanos por dónde contactarte y qué necesitas. Entra directo a nuestro sistema.',
+    boton: 'Quiero que me contacten',
+    conMensaje: true
+  });
+  conectar($('[data-pedir]', caja), () => ({ tipo: 'contacto' }));
+}
 
 function contactoBotones() {
   const caja = $('#contactoBotones');
@@ -270,7 +295,8 @@ rotador();
 capacidades();
 apariciones();
 navegacion();
+contactoForma();
 contactoBotones();
-montarCotizador();
+montarVentana();
 maquetas();
 pelicula();

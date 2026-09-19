@@ -1,21 +1,25 @@
-/* T.T AI Firm · el módulo interactivo: cinco preguntas y el resultado.
-   La pantalla se arma sola desde PREGUNTAS; no hay un caso especial por pregunta. */
+/* T.T AI Firm · la ventana donde se contesta. Sirve para los dos caminos:
+   el demo y la auditoría. Las pantallas se arman solas desde las preguntas
+   de cada cuestionario; no hay un caso especial por pregunta ni por camino. */
 
-import { PREGUNTAS } from './datos.js';
-import { calcular } from './precio.js';
-import { pantalla, acciones, resumen } from './resultado.js';
+import { DEMO } from './cotizador/cuestionario.js';
+import { AUDITORIA_Q } from './auditoria/cuestionario.js';
+import { puertasHTML } from './puertas.js';
+import { conectar } from './solicitud.js';
 
 const TIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 const FLECHA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const CUESTIONARIOS = { demo: DEMO, auditoria: AUDITORIA_Q };
 
 const raiz = document.documentElement;
-const vacias = () => ({ negocio: '', modulos: [], usuarios: '', conexiones: [], plazo: '' });
+const vacias = (preguntas) => Object.fromEntries(preguntas.map(p => [p.id, p.tipo === 'varias' ? [] : '']));
 
-let caja, panel, cuerpo, pie, barra, cuenta;
+let caja, panel, cuerpo, pie, barra, cuenta, titulo;
+let cuestionario = null;   // null = la pantalla de las dos puertas
 let paso = 0;
-let respuestas = vacias();
+let respuestas = {};
 
-/* ── armado del cascarón ── */
+/* ── cascarón ── */
 
 function armar() {
   caja = document.createElement('div');
@@ -23,9 +27,9 @@ function armar() {
   caja.setAttribute('aria-hidden', 'true');
   caja.innerHTML = `
     <div class="fondo" data-cerrar></div>
-    <div class="panel" role="dialog" aria-modal="true" aria-label="Arma tu demo" tabindex="-1">
+    <div class="panel" role="dialog" aria-modal="true" aria-label="Empezar con T.T AI Firm" tabindex="-1">
       <header>
-        <div><b>Arma tu demo</b><span class="paso mono"></span></div>
+        <div><b data-titulo>Empezar</b><span class="paso mono"></span></div>
         <button class="cerrar" data-cerrar aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </header>
       <div class="barra"><i></i></div>
@@ -39,16 +43,17 @@ function armar() {
   pie = caja.querySelector('footer');
   barra = caja.querySelector('.barra i');
   cuenta = caja.querySelector('.paso');
+  titulo = caja.querySelector('[data-titulo]');
 
   caja.addEventListener('click', (e) => { if (e.target.closest('[data-cerrar]')) cerrar(); });
-  cuerpo.addEventListener('click', alTocarOpcion);
+  cuerpo.addEventListener('click', alTocarCuerpo);
   cuerpo.addEventListener('change', alCambiarLista);
   pie.addEventListener('click', alTocarPie);
 }
 
 /* ── respuestas ── */
 
-const pregunta = () => PREGUNTAS[paso];
+const pregunta = () => cuestionario.preguntas[paso];
 const contestada = () => { const r = respuestas[pregunta().id]; return Array.isArray(r) ? r.length > 0 : Boolean(r); };
 
 function marcar(id) {
@@ -66,19 +71,30 @@ function marcar(id) {
 /* ── pintado ── */
 
 function pintar() {
-  const total = PREGUNTAS.length;
-  const enResultado = paso >= total;
-  barra.style.width = `${((enResultado ? total : paso + 1) / total) * 100}%`;
-  cuenta.textContent = enResultado ? 'Tu resultado' : `Paso ${paso + 1} de ${total}`;
   cuerpo.scrollTop = 0;
 
-  if (enResultado) return pintarResultado();
+  if (!cuestionario) {
+    titulo.textContent = 'Empezar';
+    cuenta.textContent = 'Dos caminos';
+    barra.style.width = '0%';
+    cuerpo.innerHTML = puertasHTML();
+    pie.innerHTML = '';
+    return;
+  }
+
+  const total = cuestionario.preguntas.length;
+  const enFinal = paso >= total;
+  titulo.textContent = cuestionario.titulo;
+  barra.style.width = `${((enFinal ? total : paso + 1) / total) * 100}%`;
+  cuenta.textContent = enFinal ? 'Tu resultado' : `Paso ${paso + 1} de ${total}`;
+
+  if (enFinal) return pintarFinal();
 
   const p = pregunta();
   const r = respuestas[p.id];
   const marcada = (id) => Array.isArray(r) ? r.includes(id) : r === id;
 
-  const lista = p.tipo === 'lista'
+  const control = p.tipo === 'lista'
     ? `<select class="lista" aria-label="${p.titulo}">
          <option value="" ${r ? '' : 'selected'} disabled>${p.vacio ?? 'Elige una opción…'}</option>
          ${p.opciones.map(o => `<option value="${o.id}" ${marcada(o.id) ? 'selected' : ''}>${o.nombre}</option>`).join('')}
@@ -88,25 +104,31 @@ function pintar() {
            <span><b>${o.nombre}</b>${o.nota ? `<small>${o.nota}</small>` : ''}</span><i>${TIC}</i>
          </button>`).join('')}</div>`;
 
-  cuerpo.innerHTML = `<div class="pregunta"><h3>${p.titulo}</h3><p>${p.ayuda}</p>${lista}</div>`;
+  cuerpo.innerHTML = `<div class="pregunta"><h3>${p.titulo}</h3><p>${p.ayuda}</p>${control}</div>`;
 
-  const ultimo = paso === PREGUNTAS.length - 1;
+  const ultimo = paso === total - 1;
   pie.innerHTML = `
-    <button class="boton linea" data-atras ${paso === 0 ? 'disabled' : ''}>Atrás</button>
+    <button class="boton linea" data-atras>${paso === 0 ? 'Cambiar' : 'Atrás'}</button>
     <button class="boton accion" data-siguiente ${contestada() ? '' : 'disabled'}>${ultimo ? 'Ver mi resultado' : 'Siguiente'}${FLECHA}</button>`;
 }
 
-function pintarResultado() {
-  const estimado = calcular(respuestas);
-  if (!estimado) { paso = PREGUNTAS.findIndex(p => p.id === 'modulos'); return pintar(); }
-  cuerpo.innerHTML = pantalla(estimado);
-  pie.innerHTML = acciones(estimado);
-  pie.dataset.texto = resumen(estimado);
+function pintarFinal() {
+  const final = cuestionario.final(respuestas);
+  if (!final) { paso = Math.max(0, cuestionario.preguntas.length - 4); return pintar(); }
+
+  cuerpo.innerHTML = final.html;
+  pie.innerHTML = '<button class="boton linea" data-reiniciar>Empezar de nuevo</button>' +
+                  '<button class="boton linea" data-copiar>Copiar mi resumen</button>';
+  pie.dataset.texto = final.texto;
+  conectar(cuerpo.querySelector('[data-pedir]'), () => final.sistema);
 }
 
 /* ── manos ── */
 
-function alTocarOpcion(e) {
+function alTocarCuerpo(e) {
+  const puerta = e.target.closest('[data-elegir]');
+  if (puerta) return elegir(puerta.dataset.elegir);
+
   const boton = e.target.closest('[data-opcion]');
   if (!boton) return;
   marcar(boton.dataset.opcion);
@@ -116,22 +138,32 @@ function alTocarOpcion(e) {
 }
 
 function alCambiarLista(e) {
-  if (!e.target.matches('.lista')) return;
+  if (!e.target.matches('.lista') || e.target.name) return;   // los campos del formulario no avanzan nada
   marcar(e.target.value);
   pintar();
   setTimeout(avanzar, 240);
 }
 
 function alTocarPie(e) {
-  if (e.target.closest('[data-atras]')) { paso = Math.max(0, paso - 1); pintar(); }
+  if (e.target.closest('[data-atras]')) {
+    if (paso === 0) { cuestionario = null; return pintar(); }
+    paso -= 1; pintar();
+  }
   else if (e.target.closest('[data-siguiente]')) avanzar();
-  else if (e.target.closest('[data-reiniciar]')) { respuestas = vacias(); paso = 0; pintar(); }
+  else if (e.target.closest('[data-reiniciar]')) { respuestas = vacias(cuestionario.preguntas); paso = 0; pintar(); }
   else if (e.target.closest('[data-copiar]')) copiar(e.target.closest('[data-copiar]'));
 }
 
+function elegir(cual) {
+  cuestionario = CUESTIONARIOS[cual];
+  respuestas = vacias(cuestionario.preguntas);
+  paso = 0;
+  pintar();
+}
+
 function avanzar() {
-  if (paso < PREGUNTAS.length && !contestada()) return;
-  paso = Math.min(PREGUNTAS.length, paso + 1);
+  if (paso < cuestionario.preguntas.length && !contestada()) return;
+  paso = Math.min(cuestionario.preguntas.length, paso + 1);
   pintar();
 }
 
@@ -143,9 +175,10 @@ async function copiar(boton) {
 
 /* ── abrir y cerrar ── */
 
-export function abrir() {
+export function abrir(cual = 'puertas') {
   if (!caja) armar();
-  pintar();
+  if (CUESTIONARIOS[cual]) elegir(cual);
+  else { cuestionario = null; pintar(); }
   caja.classList.add('abierto');
   caja.setAttribute('aria-hidden', 'false');
   raiz.classList.add('trabado');
@@ -160,6 +193,6 @@ export function cerrar() {
 }
 
 export function montar() {
-  document.querySelectorAll('[data-cotizador]').forEach(b => b.addEventListener('click', (e) => { e.preventDefault(); abrir(); }));
+  document.querySelectorAll('[data-modulo]').forEach(b => b.addEventListener('click', (e) => { e.preventDefault(); abrir(b.dataset.modulo); }));
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && caja?.classList.contains('abierto')) cerrar(); });
 }
