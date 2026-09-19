@@ -8,7 +8,7 @@ export const DEMO = {
   id: 'demo',
   titulo: 'Arma tu demo',
   preguntas: PREGUNTAS,
-  pide: { titulo: 'Ya casi. ¿A quién le contestamos?', ayuda: 'Te buscamos por teléfono o por correo con tu demo y su precio.', boton: 'Enviar mi solicitud', extra: '' },
+  pide: { titulo: 'Ya casi. ¿A quién le contestamos?', ayuda: 'Te buscamos por teléfono o por correo con la propuesta de tu demo.', boton: 'Enviar mi solicitud', extra: '' },
   final(respuestas) {
     const estimado = calcular(respuestas);
     if (!estimado) return null;                 // sin módulos no hay nada que estimar
