@@ -1,94 +1,85 @@
-/* T.T AI Firm · la pantalla final del cotizador y el resumen que se envía.
-   El protagonista es la auditoría: el estimado es apenas el orden de magnitud. */
+/* T.T AI Firm · la pantalla final del demo y el resumen que se copia.
+   Mientras los valores no estén confirmados no se enseña ni se manda un solo
+   número: el cliente contesta, manda su solicitud y la propuesta se la
+   devolvemos nosotros por correo. Al poner VALORES_CONFIRMADOS en true
+   vuelven a aparecer el orden de inversión, el tiempo y la mensualidad. */
 
 import { VALORES_CONFIRMADOS } from './datos.js';
-import { AUDITORIA } from '../auditoria/datos.js';
 import { pesos } from './precio.js';
 
 const nombres = (lista) => lista.map(o => o.nombre).join(', ');
-const dolares = (n) => `${AUDITORIA.moneda} ${n.toLocaleString('en-US')}`;
 
-/** Texto plano del resumen: es lo que se copia y lo que viaja por WhatsApp o correo. */
+/** Texto plano del resumen: es lo que se copia y lo que viaja al sistema. */
 export function resumen(e) {
-  return [
+  const lineas = [
     'Solicitud de demo · T.T AI Firm',
     `Giro: ${e.negocio?.nombre ?? '—'}`,
     `Quiere construir: ${nombres(e.modulos)}`,
     `Lo va a usar: ${e.usuarios?.nombre ?? '—'}`,
     `Se conecta con: ${e.conexiones.length ? nombres(e.conexiones) : '—'}`,
-    `Para cuándo: ${e.plazo?.nombre ?? '—'}`,
+    `Para cuándo: ${e.plazo?.nombre ?? '—'}`
+  ];
+  if (VALORES_CONFIRMADOS) lineas.push(
     '',
     `Orden de inversión estimado: ${pesos(e.desde)} a ${pesos(e.hasta)}`,
     `Tiempo estimado: ${e.semanas} a ${e.semanasHasta} semanas`,
-    `Acompañamiento mensual estimado: ${pesos(e.mensual)}`,
-    VALORES_CONFIRMADOS ? '' : '(estimado con valores de ejemplo, pendientes de confirmar)',
-    '',
-    `Primer paso: ${AUDITORIA.nombre}, desde ${dolares(AUDITORIA.desde)}.`
-  ].filter(Boolean).join('\n');
+    `Acompañamiento mensual estimado: ${pesos(e.mensual)}`
+  );
+  return lineas.join('\n');
 }
 
 const fila = (titulo, valor, nota) =>
   `<div class="dato"><span class="k">${titulo}</span><b>${valor}</b>${nota ? `<span class="n">${nota}</span>` : ''}</div>`;
 
-export function pantalla(e) {
-  const aviso = VALORES_CONFIRMADOS ? '' :
-    '<span class="insignia ejemplo"><i></i>Valores de ejemplo · pendientes de confirmar</span>';
+const cifras = (e) => !VALORES_CONFIRMADOS ? '' : `
+      <div class="cifras">
+        ${fila('Orden de inversión del sistema', `${pesos(e.desde)} a ${pesos(e.hasta)}`, 'Construcción completa, en pesos')}
+        ${fila('Tiempo estimado', `${e.semanas} a ${e.semanasHasta} semanas`, 'Corriendo en producción desde las primeras')}
+        ${fila('Acompañamiento mensual', pesos(e.mensual), 'Tablero vivo y revisión con dirección')}
+      </div>
+      <p class="nota">Estimado preliminar a partir de tus respuestas. El número firme se define sobre tu operación real.</p>`;
 
+export function pantalla(e) {
   const marcas = [e.negocio, e.usuarios, e.plazo, ...e.modulos, ...e.conexiones]
     .filter(Boolean).map(o => `<span class="insignia">${o.nombre}</span>`).join('');
 
   return `
     <div class="resultado">
       <p class="etiqueta izquierda">Lo que sigue</p>
-      <h3 class="titulo">Esto es lo que construiríamos para ti.</h3>
+      <h3 class="titulo">Ya tenemos lo que necesitábamos.</h3>
+      <p class="nota grande">Con lo que acabas de contestar armamos tu propuesta: qué te construiríamos, en qué orden y en cuánto tiempo. Te la mandamos por correo, hecha por nosotros y sobre tu operación, no por una calculadora.</p>
 
-      <div class="auditoria">
-        <div class="cabeza">
-          <div>
-            <span class="k">El primer paso</span>
-            <b>${AUDITORIA.nombre}</b>
-          </div>
-          <div class="precio"><b>desde ${dolares(AUDITORIA.desde)}</b><span>${AUDITORIA.duracion}${AUDITORIA.acreditable ? ' · acreditable al proyecto' : ''}</span></div>
-        </div>
-        <p>Entramos a tu operación para encontrar, con números, no solo dónde se pierde el dinero sino todo lo que puede mejorar con sistemas y digitalización. De ahí sale el alcance firme y el precio real de lo que se construye.</p>
-        <ul>${AUDITORIA.entrega.map(t => `<li>${t}</li>`).join('')}</ul>
-      </div>
-
-      <div class="cifras">
-        ${fila('Orden de inversión del sistema', `${pesos(e.desde)} a ${pesos(e.hasta)}`, 'Construcción completa, en pesos')}
-        ${fila('Tiempo estimado', `${e.semanas} a ${e.semanasHasta} semanas`, 'Corriendo en producción desde las primeras')}
-        ${fila('Acompañamiento mensual', pesos(e.mensual), 'Tablero vivo y revisión con dirección')}
-      </div>
-
-      <p class="nota">Estimado preliminar a partir de tus respuestas. El número firme sale de la auditoría, porque el alcance se define sobre tu operación real. ${aviso}</p>
+      ${cifras(e)}
 
       <div class="medida">
         <b>Todo se construye 1:1 sobre tu empresa.</b>
         <span>No vendemos licencias ni plantillas. Cada pantalla, cada regla y cada número se diseñan sobre tu forma de operar, hasta el último detalle. No existe una copia de tu sistema en ningún otro lado.</span>
       </div>
 
+      <p class="etiqueta izquierda" style="margin:22px 0 10px">Lo que nos dijiste</p>
       <div class="marcas">${marcas}</div>
     </div>`;
 }
 
 /** Lo que se manda al sistema junto con los campos del formulario. */
 export function paraElSistema(e) {
-  return {
+  const solicitud = {
     tipo: 'demo',
     giro: e.negocio?.nombre ?? '',
     quiere: e.modulos.map(m => m.nombre),
     usuarios: e.usuarios?.nombre ?? '',
     conexiones: e.conexiones.map(c => c.nombre),
     plazo: e.plazo?.nombre ?? '',
-    estimado_desde: e.desde,
-    estimado_hasta: e.hasta,
-    estimado_mensual: e.mensual,
-    semanas: e.semanas,
     resumen: resumen(e)
   };
+  // los números solo viajan cuando ya son los de verdad
+  if (VALORES_CONFIRMADOS) Object.assign(solicitud, {
+    estimado_desde: e.desde, estimado_hasta: e.hasta, estimado_mensual: e.mensual, semanas: e.semanas
+  });
+  return solicitud;
 }
 
-/** Botones del pie en la pantalla final. Enviar se hace en el formulario, aquí arriba. */
+/** Botones del pie en la pantalla final. Enviar se hace en el formulario, arriba. */
 export function acciones() {
   return '<button class="boton linea" data-reiniciar>Empezar de nuevo</button>' +
          '<button class="boton linea" data-copiar>Copiar mi resumen</button>';

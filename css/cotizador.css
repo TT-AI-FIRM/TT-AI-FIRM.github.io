@@ -151,3 +151,6 @@
 .llego { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; margin-bottom: 18px; border-radius: 12px; background: rgba(110, 231, 168, .12); box-shadow: inset 0 0 0 1px rgba(110, 231, 168, .4); }
 .llego b { font-family: var(--display); font-weight: 500; font-size: 16px; color: #8ff0bd; }
 .llego span { font-size: 13.5px; line-height: 1.5; color: var(--apagado); }
+
+/* el párrafo grande de la pantalla final, cuando no se enseñan números */
+.resultado .nota.grande { font-size: 14.5px; line-height: 1.55; color: var(--apagado); margin-top: 14px; }

@@ -19,9 +19,9 @@ export function puertasHTML() {
       </button>
 
       <button class="puerta" data-elegir="demo">
-        <span class="k">Con precio según el alcance</span>
+        <span class="k">Cinco preguntas · te contestamos por correo</span>
         <b>Armar un demo de mi sistema</b>
-        <span class="d">Una muestra real de tu sistema, hecha sobre tu negocio, antes de comprometer el proyecto completo. Te decimos qué lleva, cuánto tarda y qué cuesta.</span>
+        <span class="d">Una muestra real de tu sistema, hecha sobre tu negocio, antes de comprometer el proyecto completo. Contestas unas preguntas y te mandamos por correo qué te construiríamos y qué lleva.</span>
         <span class="ir">Son 5 preguntas<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </button>
     </div>`;

@@ -11,7 +11,7 @@ export function formularioHTML({ titulo, ayuda, boton, conMensaje = false, extra
       <div class="encabezado"><b>${titulo}</b><span>${ayuda}</span></div>
       <div class="campos">
         <label><span>Tu nombre</span><input name="nombre" maxlength="80" autocomplete="name" required></label>
-        <label><span>Nombre de la empresa</span><input name="empresa" maxlength="120" autocomplete="organization"></label>
+        <label><span>Nombre de la empresa</span><input name="empresa" maxlength="120" autocomplete="organization" required></label>
         <label><span>Teléfono</span><input name="telefono" type="tel" inputmode="tel" maxlength="40" autocomplete="tel" required></label>
         <label><span>Correo electrónico</span><input name="correo" type="email" inputmode="email" maxlength="120" autocomplete="email" required></label>
         ${extra}
@@ -46,10 +46,12 @@ export function conectar(form, extras = () => ({}), alLograr = null) {
 
     const campos = Object.fromEntries(new FormData(form));
     const nombre = campos.nombre.trim();
+    const empresa = campos.empresa.trim();
     const telefono = campos.telefono.trim();
     const correo = campos.correo.trim();
 
     if (nombre.length < 2) return marcar(form, aviso, 'Falta tu nombre.', 'nombre');
+    if (empresa.length < 2) return marcar(form, aviso, 'Falta el nombre de la empresa.', 'empresa');
     if (!telefonoValido(telefono)) return marcar(form, aviso, 'El teléfono no está completo.', 'telefono');
     if (!correoValido(correo)) return marcar(form, aviso, 'Revisa el correo electrónico.', 'correo');
 
@@ -60,7 +62,7 @@ export function conectar(form, extras = () => ({}), alLograr = null) {
 
     const { ok, error } = await enviarSolicitud({
       nombre,
-      empresa: campos.empresa.trim(),
+      empresa,
       contacto: `${correo} · ${telefono}`,
       mensaje: (campos.mensaje || '').trim(),
       plazo: campos.plazo || '',
