@@ -1,16 +1,16 @@
 // Capa de campaña: noche, grano y neón. Entrada, ráfaga de lo que sigue y cierre.
 import { nodo, tramo, salida, aparecer } from '../comun.js';
 
-// ---------- 1 · Entrada: partículas que forman TU MARCA, se rompen y queda el hoodie ----------
+// ---------- 1 · Entrada: partículas forman T.T AI FIRM, × y la moneda 3D con el logo del canal ----------
 let puntos = null;
 function muestrearTexto() {
-  const c = document.createElement('canvas'); c.width = 1080; c.height = 400;
-  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.font = '700 190px Pixel'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText('TU MARCA', 540, 200);
-  const d = g.getImageData(0, 0, 1080, 400).data, out = [];
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 300;
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.font = '700 118px Pixel'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('T.T AI FIRM', 540, 150);
+  const d = g.getImageData(0, 0, 1080, 300).data, out = [];
   let semilla = 11; const azar = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;
-  for (let y = 0; y < 400; y += 7) for (let x = 0; x < 1080; x += 7)
-    if (d[(y * 1080 + x) * 4 + 3] > 128) out.push({ x, y: y + 760, sx: azar() * 1080, sy: azar() * 1920, ang: azar() * Math.PI * 2, vel: 300 + azar() * 900, tam: 3 + azar() * 4 });
+  for (let y = 0; y < 300; y += 6) for (let x = 0; x < 1080; x += 6)
+    if (d[(y * 1080 + x) * 4 + 3] > 128) out.push({ x, y: y + 260, sx: azar() * 1080, sy: azar() * 1920, tam: 3 + azar() * 3 });
   return out;
 }
 
@@ -18,28 +18,33 @@ export const entrada = {
   dur: 6,
   montar: () => nodo(`<div class="oscuro">
     <div class="fondo-noche"></div><canvas class="particulas" width="1080" height="1920" style="position:absolute;inset:0"></canvas><div class="grano"></div>
-    <div class="lema" style="position:absolute;left:70px;right:70px;bottom:250px;text-align:center">
-      <div class="pixel" style="font:700 76px/1.15 Pixel;color:#fff">Tu marca.<br>Tu comunidad.</div>
-      <div class="pixel" style="font:700 76px/1.15 Pixel;color:var(--neon);margin-top:10px">Un solo lugar.</div>
+    <div class="por" style="position:absolute;left:0;right:0;top:560px;text-align:center;font:400 110px Inter;color:#fff">×</div>
+    <div class="canal" style="position:absolute;left:0;right:0;top:1290px;text-align:center">
+      <div style="font:900 84px Inter;color:#fff;letter-spacing:-1px">jointkidkick</div>
+      <span class="chip" style="background:#53fc18;color:#000;margin-top:18px">kick.com/jointkidkick</span>
+    </div>
+    <div class="lema" style="position:absolute;left:70px;right:70px;bottom:150px;text-align:center">
+      <div class="pixel" style="font:700 60px/1.15 Pixel;color:#fff">Tu marca.<br>Tu comunidad.</div>
+      <div class="pixel" style="font:700 60px/1.15 Pixel;color:var(--neon);margin-top:8px">Un solo lugar.</div>
     </div></div>`),
   paso(t, n) {
     puntos ??= muestrearTexto();
     const g = n.querySelector('.particulas').getContext('2d');
     g.clearRect(0, 0, 1080, 1920);
-    const junta = salida(tramo(t, 0, 2)), rompe = tramo(t, 3, 4.6);
-    g.fillStyle = '#b6ff00'; g.shadowColor = '#b6ff00'; g.shadowBlur = 12;
+    const junta = salida(tramo(t, 0, 1.8));
+    g.fillStyle = '#ffffff'; g.shadowColor = '#b6ff00'; g.shadowBlur = 10 * (1 - junta) + 4;
     for (const p of puntos) {
-      let x = p.sx + (p.x - p.sx) * junta, y = p.sy + (p.y - p.sy) * junta;
-      if (rompe > 0) { const r = salida(rompe) * p.vel; x += Math.cos(p.ang) * r; y += Math.sin(p.ang) * r; }
-      g.globalAlpha = (0.35 + 0.65 * junta) * (1 - rompe);
-      g.fillRect(x, y, p.tam, p.tam);
+      g.globalAlpha = 0.3 + 0.7 * junta;
+      g.fillRect(p.sx + (p.x - p.sx) * junta, p.sy + (p.y - p.sy) * junta, p.tam, p.tam);
     }
     g.globalAlpha = 1;
-    aparecer(n.querySelector('.lema'), tramo(t, 4, 4.8));
+    aparecer(n.querySelector('.por'), tramo(t, 1.8, 2.3));
+    aparecer(n.querySelector('.canal'), tramo(t, 3, 3.6));
+    aparecer(n.querySelector('.lema'), tramo(t, 4, 4.7));
   },
-  hoodie: (t) => t < 3.2 ? null : {
-    look: 'noche', x: 540, y: 820, alto: 900 * (0.85 + 0.15 * salida(tramo(t, 3.2, 4.4))),
-    giro: -0.6 + t * 0.55, opacidad: salida(tramo(t, 3.2, 4)),
+  hoodie: (t) => t < 2.2 ? null : {
+    objeto: 'logo', x: 540, y: 1000, alto: 480 * (0.6 + 0.4 * salida(tramo(t, 2.2, 3.2))),
+    giro: (1 - salida(tramo(t, 2.2, 3.6))) * Math.PI * 3 + Math.sin(t * 1.6) * 0.25, inclina: -0.08, opacidad: tramo(t, 2.2, 2.6),
   },
 };
 

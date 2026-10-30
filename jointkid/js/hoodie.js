@@ -1,4 +1,4 @@
-// El hoodie 3D: hecho en código, sin modelo externo.
+// El hoodie 3D (y la moneda con el logo del canal): hechos en código, sin modelo externo.
 // La cámara está calibrada para que 1 unidad = 1 px del escenario de 1080×1920,
 // así cada escena lo coloca con coordenadas de pantalla: ponerHoodie({ x, y, alto, giro, look }).
 import * as THREE from '../lib/three.module.min.js';
@@ -7,7 +7,7 @@ import { RoomEnvironment } from '../lib/RoomEnvironment.js';
 const W = 1080, H = 1920, FOV = 16;
 const D = H / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
 
-let renderer, scene, camera, grupo, tela, resorte, cordon, luces, visible = false;
+let renderer, scene, camera, grupo, moneda, tela, resorte, cordon, luces, visible = false;
 
 // ---------- ruido ----------
 function hash(x, y, z) { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); }
@@ -134,6 +134,23 @@ function armarPrenda() {
   return g;
 }
 
+// Moneda con el logo del canal de Kick: el logo en las dos caras y canto de metal neón.
+const ROTAR_LOGO = Math.PI / 2;
+export let logoListo;
+function armarMoneda() {
+  let avisar; logoListo = new Promise((r) => (avisar = r));
+  const tex = new THREE.TextureLoader().load('assets/avatar.webp', avisar, undefined, avisar);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.center.set(0.5, 0.5); tex.rotation = ROTAR_LOGO;
+  // El logo se ve con sus colores reales (emisivo) y la capa de barniz le da el brillo 3D.
+  const cara = new THREE.MeshPhysicalMaterial({ color: 0x000000, emissive: 0xffffff, emissiveMap: tex, roughness: 0.5, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 0.12, toneMapped: false });
+  const canto = new THREE.MeshPhysicalMaterial({ color: 0xb6ff00, emissive: 0x2f4a00, metalness: 0.9, roughness: 0.25 });
+  const geo = new THREE.CylinderGeometry(0.5, 0.5, 0.07, 160); geo.rotateX(Math.PI / 2);
+  const m = new THREE.Group();
+  m.add(new THREE.Mesh(geo, [canto, cara, cara]));
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.022, 24, 160), canto); m.add(aro);
+  return m;
+}
+
 // Los looks: "app" (blanco de catálogo) y "noche" (negro con contraluz neón).
 const LOOKS = {
   app:   { tela: 0xe9e7e1, brillo: 0xffffff, cordon: 0xdedbd2, tinta: '#1b1b1b', key: 2.2, neon: 0.8, exp: 1.05 },
@@ -155,6 +172,7 @@ export function montarHoodie(lienzo) {
   resorte = tela.clone(); resorte.normalMap = normalResorte(); resorte.normalScale = new THREE.Vector2(1.2, 1.2);
   cordon = new THREE.MeshStandardMaterial({ roughness: 0.7 });
   grupo = armarPrenda(); scene.add(grupo);
+  moneda = armarMoneda(); scene.add(moneda);
 
   const key = new THREE.DirectionalLight(0xffffff, 2); key.position.set(2, 3, 4);
   const fill = new THREE.DirectionalLight(0xdfe8ff, 0.6); fill.position.set(-3, 1, 2);
@@ -175,9 +193,10 @@ export function ponerHoodie(o) {
   est.material.map = texturas[L.tinta]; est.material.needsUpdate = true;
   luces.key.intensity = L.key; luces.neonA.intensity = L.neon; luces.neonB.intensity = L.neon * 0.66;
   renderer.toneMappingExposure = L.exp;
-  const s = o.alto / 1.45;
-  grupo.scale.setScalar(s); grupo.position.set(o.x, -o.y, 0);
-  grupo.rotation.set(o.inclina || 0, o.giro || 0, 0);
+  const obj = o.objeto === 'logo' ? moneda : grupo;
+  grupo.visible = obj === grupo; moneda.visible = obj === moneda;
+  obj.scale.setScalar(o.alto / (obj === grupo ? 1.45 : 1)); obj.position.set(o.x, -o.y, 0);
+  obj.rotation.set(o.inclina || 0, o.giro || 0, 0);
   renderer.domElement.style.opacity = o.opacidad ?? 1;
   renderer.render(scene, camera); visible = true;
 }

@@ -6,7 +6,7 @@ Video vertical de 90 s (1080×1920) hecho en código: HTML + three.js. El hoodie
 |---|---|
 | `js/main.js` | El reloj y el orden de las 15 escenas. El mismo segundo siempre da el mismo cuadro |
 | `js/hoodie.js` | El hoodie 3D y sus dos looks: `app` (blanco) y `noche` (negro con neón) |
-| `js/escenas/campana.js` | Entrada, ráfaga de lo que sigue y cierre |
+| `js/escenas/campana.js` | Entrada (T.T AI FIRM × moneda 3D con el logo del canal), ráfaga de lo que sigue y cierre |
 | `js/escenas/fan.js` | Central del fan, dentro del celular: login, drop, ficha 3D/AR, puntos, pago, NFC y clóset |
 | `js/escenas/stream.js` | Overlay de T.T en el stream |
 | `js/escenas/panel.js` | Central del dueño: hoy, pedido, gráfica, ganancia e IA |

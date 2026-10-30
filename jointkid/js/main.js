@@ -2,7 +2,7 @@
 // El tiempo manda: el mismo t siempre da el mismo cuadro, así el video se exporta cuadro por cuadro.
 //   ?t=12.5   congela el video en ese segundo (para fotos y storyboard)
 //   ?exportar  no arranca solo; el exportador llama window.irA(t)
-import { montarHoodie, ponerHoodie } from './hoodie.js';
+import { montarHoodie, ponerHoodie, logoListo } from './hoodie.js';
 import { limitar } from './comun.js';
 import * as campana from './escenas/campana.js';
 import * as fan from './escenas/fan.js';
@@ -53,7 +53,7 @@ window.irA = irA;
 window.DURACION = DURACION;
 
 const q = new URLSearchParams(location.search);
-document.fonts.ready.then(() => {
+Promise.all([document.fonts.ready, logoListo]).then(() => {
   if (q.has('t')) { irA(parseFloat(q.get('t'))); window.listo = true; return; }
   if (q.has('exportar')) { window.listo = true; return; }
   const t0 = performance.now();
