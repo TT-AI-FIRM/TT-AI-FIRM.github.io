@@ -8,6 +8,11 @@ const COMPRAS = [
   { t: 6.4, quien: '@vale_cdmx', pieza: '025' },
 ];
 const DESDE = 22, HASTA = 38, TOTAL = 50;
+// Chat del stream (la API de Kick sí da los mensajes del chat).
+const CHAT = [['lalo.mx', 'ya compré 🔥'], ['vale_cdmx', 'quedan poquitas!!'], ['kiki.r', 'el negro está brutal'], ['fan', 'me llegó el cupón del canje'],
+  ['tono.gdl', 'envían a Guadalajara?'], ['mau.mtz', 'la 025 es mía'], ['dany', 'cuándo el siguiente drop'], ['sofi.cdmx', 'ya la escaneé, sí es original'],
+  ['lalo.mx', 'GG'], ['kiki.r', 'precio de sub 🙏'], ['vale_cdmx', 'vota por el verde'], ['tono.gdl', 'link en la app']];
+const COLORES = ['#b6ff00', '#7fd1ff', '#ff9ad5', '#ffd23f', '#a78bfa'];
 
 export const envivo = {
   dur: 10,
@@ -36,6 +41,8 @@ export const envivo = {
       </div>
       <div class="quedan" style="font:700 46px Inter;margin-top:24px"></div>
     </div>
+    <div class="chat" style="position:absolute;left:70px;right:70px;top:1000px;height:400px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+      -webkit-mask-image:linear-gradient(transparent,#000 35%);mask-image:linear-gradient(transparent,#000 35%)"></div>
     <div class="chip blanco" style="position:absolute;left:70px;bottom:120px;font-size:28px">Overlay de T.T en OBS</div>
   </div>`),
   paso(t, n) {
@@ -50,5 +57,9 @@ export const envivo = {
     n.querySelector('.cuenta').textContent = `${vendidas}/${TOTAL}`;
     n.querySelector('.barra').style.width = `${vendidas / TOTAL * 100}%`;
     n.querySelector('.quedan').textContent = `Quedan ${TOTAL - vendidas}`;
+    const m = Math.min(CHAT.length, Math.floor(t / 0.75) + 1), sube = salida((t / 0.75) % 1 * 3);
+    n.querySelector('.chat').innerHTML = CHAT.slice(Math.max(0, m - 6), m).map(([u, txt], j, arr) =>
+      `<div style="font:600 40px/1.35 Inter;color:#fff;text-shadow:0 2px 8px #000;opacity:${j === arr.length - 1 ? Math.min(1, sube) : 1}">
+        <b style="color:${COLORES[u.length % COLORES.length]}">${u}</b> ${txt}</div>`).join('');
   },
 };

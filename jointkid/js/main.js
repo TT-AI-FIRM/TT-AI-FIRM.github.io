@@ -7,13 +7,13 @@ import { limitar } from './comun.js';
 import * as campana from './escenas/campana.js';
 import * as fan from './escenas/fan.js';
 import * as stream from './escenas/stream.js';
-import * as panel from './escenas/panel.js';
+import * as dueno from './escenas/dueno.js';
 
 const ORDEN = [
   campana.entrada,
-  fan.login, fan.drop, fan.ficha, fan.puntos, fan.pago, fan.coleccion,
+  fan.bloque,
   stream.envivo,
-  panel.hoy, panel.pedido, panel.grafica, panel.ganancia, panel.ia,
+  dueno.bloque,
   campana.rafaga, campana.cierre,
 ];
 const CRUCE = 0.4; // segundos de fundido entre escenas

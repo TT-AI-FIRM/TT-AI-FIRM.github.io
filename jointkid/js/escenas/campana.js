@@ -5,7 +5,7 @@ import { nodo, tramo, salida, aparecer } from '../comun.js';
 let puntos = null;
 function muestrearTexto() {
   const c = document.createElement('canvas'); c.width = 1080; c.height = 300;
-  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.font = '700 118px Pixel'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.font = '900 136px Pixel'; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.fillText('T.T AI FIRM', 540, 150);
   const d = g.getImageData(0, 0, 1080, 300).data, out = [];
   let semilla = 11; const azar = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;

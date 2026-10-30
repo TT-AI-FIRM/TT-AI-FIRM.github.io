@@ -1,169 +1,184 @@
-// Central del fan: todo pasa dentro del celular. Una sola venta, la pieza 023, de principio a fin.
-// Coordenadas dentro de la pantalla: la pantalla empieza en (88, 418) del escenario.
-import { nodo, tramo, salida, aparecer, telefono, encabezado, USUARIO } from '../comun.js';
+// Central del fan: un solo celular durante todo el bloque. Las pantallas se deslizan como en una app real
+// y un dedo toca, arrastra y desliza. Una sola venta, la pieza 023, de principio a fin.
+// Coordenadas de pantalla: 904×1664, con origen en (88, 418) del escenario.
+import { nodo, tramo, salida, suave, resorte, aparecer, cifra } from '../comun.js';
+import { PANTALLAS } from './fan-pantallas.js';
 
-const PY = 418; // y del escenario donde empieza la pantalla
-const escena = (titulo, sub, tel, extra = '') =>
-  nodo(`<div class="claro"><div class="fondo-claro"></div><div class="reticula"></div>${encabezado(titulo, sub)}${tel}${extra}</div>`);
-const ver = (n, sel, p) => aparecer(n.querySelector(sel), p);
-const mostrar = (n, sel, si) => { const e = n.querySelector(sel); if (e) e.style.display = si ? '' : 'none'; };
+const SX = 88, SY = 418, SW = 904, CX = 540, CY = 1100;
+// Cada corte abre la pantalla siguiente (deslizando desde la derecha).
+const CORTES = [0, 2.4, 5, 10, 17, 22, 27, 31.3];
+const TEXTOS = [
+  ['Entra con Kick', 'Con tu cuenta del canal. Sin registrarte.'],
+  ['Eres sub: precio de sub', 'La app sabe quién apoya el canal.'],
+  ['Drop en vivo', 'Viernes 8 pm. Se anuncia en el stream.'],
+  ['Gíralo. Póntelo enfrente.', 'Cada pieza numerada. AR en tu cuarto.'],
+  ['Tus puntos valen', 'Canjeas en Kick. El cupón llega solo.'],
+  ['Paga como quieras', 'Apple Pay, tarjeta u OXXO.'],
+  ['Llega. La escaneas.', 'Original, y a tu nombre.'],
+  ['Tu clóset digital', 'Todo lo que compras, en un lugar.'],
+];
+// Gestos del dedo: de (x0,y0) a (x1,y1) entre a y b; toca en `tap`; `arrastre` lo mueve de lado a lado.
+const GESTOS = [
+  { a: 0.5, b: 1.9, x0: 720, y0: 1350, x1: 452, y1: 970, tap: 1.6 },
+  { a: 7.5, b: 8.7, x0: 760, y0: 1300, x1: 452, y1: 1005, tap: 8.3 },
+  { a: 10.8, b: 13.7, x0: 300, y0: 860, arrastre: true },
+  { a: 13.8, b: 14.5, x0: 640, y0: 1150, x1: 452, y1: 1355, tap: 14.3 },
+  { a: 18.0, b: 18.9, x0: 700, y0: 700, x1: 452, y1: 250, tap: 18.7 },
+  { a: 22.8, b: 23.6, x0: 720, y0: 1300, x1: 452, y1: 760, tap: 23.4 },
+  { a: 23.6, b: 24.4, x0: 452, y0: 760, x1: 452, y1: 1320, tap: 24.2 },
+  { a: 33.4, b: 34.7, x0: 720, y0: 950, x1: 180, y1: 900 },
+];
 
-// ---------- 2a · Login con Kick ----------
-export const login = {
-  dur: 5,
-  montar: () => escena('Entra con Kick', 'Si eres sub, ves tu precio de sub.', telefono(`
-    <div class="paso1">
-      <div style="position:absolute;top:330px;left:60px;right:60px;text-align:center">
-        <div class="avatar" style="width:220px;height:220px;margin:0 auto;background-image:url(assets/avatar.webp)"></div>
-        <div style="font:800 60px Inter;margin-top:40px">TU MARCA</div>
-        <div style="font:600 38px Inter;color:#777;margin-top:12px">de @${USUARIO}</div>
-      </div>
-      <div class="boton kick" style="top:900px">Entrar con Kick</div>
-    </div>
-    <div class="paso2">
-      <div class="chip neon" style="position:absolute;top:290px;left:60px">✓ Sub de @${USUARIO}</div>
-      <div class="tarjeta-iri" style="top:410px;left:60px;right:60px;height:760px"></div>
-      <div style="position:absolute;top:1200px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:baseline">
-        <span style="font:700 46px Inter">Hoodie TU MARCA</span>
-        <span><span class="tachado" style="font-size:40px">$1,200</span> <span class="precio">$999</span></span>
-      </div>
-      <div style="position:absolute;top:1290px;right:60px;font:700 34px Inter;color:#3a8f00">Precio de sub</div>
-    </div>`, { titulo: 'Hola,', negrita: '@fan' })),
+const indice = (t) => { let i = 0; CORTES.forEach((c, k) => { if (t >= c) i = k; }); return i; };
+const avance = (t) => { const i = indice(t); return i === 0 ? 1 : salida(tramo(t, CORTES[i], CORTES[i] + 0.55)); };
+// Posición horizontal de cada pantalla: la nueva entra desde la derecha, la anterior se corre un poco.
+function posVista(v, t) {
+  const i = indice(t), p = avance(t);
+  if (v === i) return (1 - p) * SW;
+  if (v === i - 1 && p < 1) return -p * SW * 0.3;
+  return null;
+}
+const camara = (t) => ({ s: 1 + 0.03 * (0.5 - 0.5 * Math.cos(t * 0.45)), dx: Math.sin(t * 0.7) * 6, dy: Math.sin(t * 1.2) * 8 });
+
+function dedo(t) {
+  for (const g of GESTOS) {
+    if (t < g.a || t > g.b) continue;
+    const vis = Math.min(tramo(t, g.a, g.a + 0.15), 1 - tramo(t, g.b - 0.15, g.b));
+    let x, y;
+    if (g.arrastre) { const k = tramo(t, g.a + 0.2, g.b - 0.2); x = g.x0 + Math.sin(k * Math.PI * 1.5) * 330; y = g.y0 + Math.sin(k * Math.PI * 3) * 20; }
+    else { const k = suave(tramo(t, g.a, g.tap ? g.tap - 0.1 : g.b - 0.1)); x = g.x0 + (g.x1 - g.x0) * k; y = g.y0 + (g.y1 - g.y0) * k; }
+    const toque = g.tap ? Math.max(0, 1 - Math.abs(t - g.tap) / 0.12) : g.arrastre ? 0.5 : 0;
+    const onda = g.tap && t > g.tap ? tramo(t, g.tap, g.tap + 0.45) : 0;
+    return { x, y, vis, toque, onda };
+  }
+  return null;
+}
+
+// Pose del hoodie en coordenadas de la pantalla, según la pantalla i.
+function poseCruda(t, i) {
+  if (i === 1) return { look: 'app', x: 452, y: 760, alto: 600, giro: 0.3 + t * 0.3, opacidad: tramo(t, 2.8, 3.3) };
+  if (i === 2) return { look: 'noche', x: 452, y: 590 + scrollFeed(t), alto: 470, giro: -0.5 + t * 0.4 };
+  if (i === 3) return t < 14.4
+    ? { look: 'app', x: 452, y: 740, alto: 740, giro: giroArrastre(t) }
+    : { look: 'app', x: 452, y: 930 - 420 * (1 - resorte(tramo(t, 14.5, 15.6))), alto: 600, giro: 0.4 + (t - 14.5) * 0.15, opacidad: tramo(t, 14.5, 14.8) };
+  if (i === 7) {
+    const negro = t > 34.1;
+    const x = negro ? 452 + 300 * (1 - salida(tramo(t, 34.1, 34.6))) : 452 - 700 * salida(tramo(t, 33.6, 34.4));
+    return { look: 'app', color: negro ? 0x1a1a1a : undefined, x, y: 960, alto: 620, giro: 0.3 + (t - 31) * 0.3, opacidad: tramo(t, 32.2, 32.7) };
+  }
+  return null;
+}
+
+// Rotación del hoodie mientras el dedo lo arrastra en la ficha.
+const giroArrastre = (t) => 0.35 + Math.sin(tramo(t, 11, 13.5) * Math.PI * 1.5) * 1.7;
+
+export const bloque = {
+  dur: 36,
+  montar: () => nodo(`<div class="claro fan">
+    <div class="fondo-claro"></div><div class="reticula"></div>
+    <div class="cabecera"><div class="titulo"></div><div class="sub"></div></div>
+    <div class="tel"><div class="pantalla">
+      ${PANTALLAS.map((h, i) => `<div class="vista" data-v="${i}">${h}</div>`).join('')}
+      <div class="isla"></div>
+      <div class="barra-estado"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="nav"><span>▦</span><span class="escaner">⌖</span><span>♨</span></div>
+      <div class="dedo"><i></i></div>
+    </div></div></div>`),
   paso(t, n) {
-    const cambio = t > 2;
-    mostrar(n, '.paso1', !cambio); mostrar(n, '.paso2', cambio);
-    const b = n.querySelector('.boton.kick'); b.style.transform = `scale(${1 - 0.05 * tramo(t, 1.5, 1.7) + 0.05 * tramo(t, 1.7, 1.9)})`;
-    ver(n, '.chip', tramo(t, 2, 2.4)); ver(n, '.tarjeta-iri', tramo(t, 2.1, 2.6));
+    const i = indice(t), c = camara(t);
+    n.querySelector('.tel').style.transform = `translate(${c.dx}px,${c.dy}px) scale(${c.s})`;
+    const [tit, sub] = TEXTOS[i], cab = n.querySelector('.cabecera');
+    if (cab.dataset.i !== String(i)) { cab.querySelector('.titulo').textContent = tit; cab.querySelector('.sub').textContent = sub; cab.dataset.i = i; }
+    aparecer(cab, i === 0 ? 1 : tramo(t, CORTES[i] + 0.1, CORTES[i] + 0.5));
+    n.querySelectorAll('.vista').forEach((v) => {
+      const x = posVista(+v.dataset.v, t);
+      v.style.display = x === null ? 'none' : '';
+      if (x !== null) { v.style.transform = `translateX(${x}px)`; v.style.filter = x < 0 ? `brightness(${1 + x / SW})` : ''; }
+    });
+    n.querySelector('.barra-estado').style.color = i === 6 ? '#fff' : '';
+    const d = dedo(t), el = n.querySelector('.dedo');
+    el.style.opacity = d ? d.vis : 0;
+    if (d) {
+      el.style.transform = `translate(${d.x - 55}px,${d.y - 55}px) scale(${1 - 0.18 * d.toque})`;
+      const o = el.querySelector('i'); o.style.transform = `scale(${1 + d.onda * 1.6})`; o.style.opacity = d.onda ? 1 - d.onda : 0;
+    }
+    animarPantallas(t, n);
   },
-  hoodie: (t) => t < 2.2 ? null : { look: 'app', x: 540, y: PY + 790, alto: 620, giro: 0.3 + t * 0.25, opacidad: tramo(t, 2.2, 2.6) },
-};
-
-// ---------- 2b · Drop con contador ----------
-export const drop = {
-  dur: 5,
-  montar: () => escena('Drop en vivo', 'Viernes 8 pm. Se anuncia en el stream.', telefono(`
-    <div style="position:absolute;top:290px;left:60px;right:60px;height:820px;border-radius:56px;background:radial-gradient(70% 60% at 50% 40%,#1d2a14,#050605)"></div>
-    <div class="chip neon" style="position:absolute;top:330px;left:100px">DROP 001</div>
-    <div class="chip negro" style="position:absolute;top:330px;right:100px;background:#ffffff22">● EN VIVO</div>
-    <div style="position:absolute;top:930px;left:100px;right:100px;color:#fff">
-      <div class="pixel" style="font:700 40px Pixel;color:#b6ff00">Viernes · 8:00 pm</div>
-      <div class="reloj pixel" style="font:700 84px Pixel;margin-top:6px">02:14:07:33</div>
-    </div>
-    <div style="position:absolute;top:1135px;left:60px;font:700 44px Inter">50 piezas numeradas</div>
-    <div class="boton negro aviso-btn" style="top:1210px;height:120px">Avísame cuando abra</div>`, { titulo: 'Discover' })),
-  paso(t, n) {
-    const s = 2 * 86400 + 14 * 3600 + 7 * 60 + 33 - Math.floor(t * 7), p = (x) => String(x).padStart(2, '0');
-    n.querySelector('.reloj').textContent = `${p(Math.floor(s / 86400))}:${p(Math.floor(s / 3600) % 24)}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}`;
-    const b = n.querySelector('.aviso-btn'), listo = t > 3;
-    b.textContent = listo ? '✓ Te avisamos en tu celular' : 'Avísame cuando abra';
-    b.className = 'boton aviso-btn ' + (listo ? 'neon' : 'negro');
-  },
-  hoodie: (t) => ({ look: 'noche', x: 540, y: PY + 600, alto: 520, giro: -0.5 + t * 0.4 }),
-};
-
-// ---------- 2c · Ficha 3D + AR ----------
-export const ficha = {
-  dur: 7,
-  montar: () => escena('Gíralo. Póntelo enfrente.', 'Cada pieza numerada. AR en tu cuarto.', telefono(`
-    <div class="vista3d">
-      <div class="tarjeta-iri" style="top:270px;left:40px;right:40px;height:980px"></div>
-      <div class="chip blanco" style="position:absolute;top:1130px;left:80px;z-index:6">PIEZA 023 / 50</div>
-      <div class="dedo" style="position:absolute;top:900px;left:300px;width:110px;height:110px;border-radius:50%;background:#0003;box-shadow:0 0 0 14px #0001"></div>
-      <div class="boton negro" style="top:1290px;height:130px">◎ Ver en tu cuarto</div>
-    </div>
-    <div class="vistaar" style="position:absolute;inset:0;background:linear-gradient(#cfc8bd 0 58%,#a8957c 58%)">
-      <div style="position:absolute;left:0;right:0;top:58%;bottom:0;background-image:linear-gradient(#0001 2px,transparent 2px),linear-gradient(90deg,#0001 2px,transparent 2px);background-size:90px 60px;transform:perspective(600px) rotateX(55deg);transform-origin:top"></div>
-      <div style="position:absolute;top:180px;left:60%;width:260px;height:340px;background:#e8e2d6;box-shadow:inset 0 0 0 16px #8a7a63"></div>
-      <div class="reticulo" style="position:absolute;left:50%;top:1200px;width:420px;height:140px;margin-left:-210px;border:5px solid #fff;border-radius:50%"></div>
-      <div class="chip blanco" style="position:absolute;top:270px;left:60px">AR · tu cuarto</div>
-    </div>`, { titulo: 'Hoodie', negrita: '023' })),
-  paso(t, n) {
-    const ar = t > 4.2;
-    n.querySelector('.vistaar').style.opacity = tramo(t, 4.2, 4.6);
-    n.querySelector('.vista3d').style.opacity = 1 - tramo(t, 4.2, 4.6);
-    const d = n.querySelector('.dedo'), arr = tramo(t, 0.8, 3.2);
-    d.style.transform = `translateX(${Math.sin(arr * Math.PI) * 340}px)`; d.style.opacity = arr > 0 && arr < 1 ? 1 : 0;
-    n.querySelector('.reticulo').style.opacity = ar ? 1 - tramo(t, 5.2, 5.8) : 0;
-  },
-  hoodie: (t) => t < 4.2
-    ? { look: 'app', x: 540, y: PY + 760, alto: 760, giro: 0.35 + Math.sin(tramo(t, 0.8, 3.2) * Math.PI) * 1.6 }
-    : { look: 'app', x: 540, y: PY + 1000 - 60 * salida(tramo(t, 4.4, 5.4)), alto: 600, giro: 0.4, opacidad: tramo(t, 4.4, 5) },
-};
-
-// ---------- 2d · Puntos del canal → cupón ----------
-export const puntos = {
-  dur: 5,
-  montar: () => escena('Tus puntos valen', 'Canjeas en Kick. El cupón llega solo.', telefono(`
-    <div class="aviso" style="top:280px">
-      <div style="font:700 30px Inter;color:#3a8f00">KICK · PUNTOS DEL CANAL</div>
-      Canjeaste <b>“Cupón TU MARCA”</b> en el chat de @${USUARIO}
-    </div>
-    <div class="flujo pixel" style="position:absolute;top:560px;left:60px;right:60px;display:flex;justify-content:space-between;font:700 34px Pixel;color:#999">
-      <span>Kick</span><span>→</span><span>T.T</span><span>→</span><span style="color:#111">Tu app</span>
-    </div>
-    <div class="cupon" style="position:absolute;top:700px;left:60px;right:60px;height:520px;border-radius:56px;background:#111;color:#fff;padding:60px">
-      <div style="font:600 36px Inter;color:#b6ff00">TU CUPÓN</div>
-      <div style="font:700 200px/1 Pixel;color:#b6ff00;margin-top:20px">-15%</div>
-      <div style="font:600 40px Inter;margin-top:30px">Código TUMARCA-7Q2K · un solo uso</div>
-    </div>`, { titulo: 'Mi', negrita: 'Cartera' })),
-  paso(t, n) {
-    ver(n, '.aviso', tramo(t, 0.2, 0.7)); ver(n, '.flujo', tramo(t, 1, 1.5)); ver(n, '.cupon', tramo(t, 1.8, 2.4));
-    n.querySelector('.cupon').style.transform += ` scale(${0.9 + 0.1 * salida(tramo(t, 1.8, 2.4))})`;
-  },
-};
-
-// ---------- 2e · Pago ----------
-export const pago = {
-  dur: 5,
-  montar: () => escena('Paga como quieras', 'Apple Pay, tarjeta u OXXO.', telefono(`
-    <div style="position:absolute;top:280px;left:60px;right:60px;font:600 42px/1.7 Inter">
-      <div style="display:flex;justify-content:space-between"><span>Hoodie 023 · precio sub</span><b>$999</b></div>
-      <div style="display:flex;justify-content:space-between;color:#3a8f00"><span>Cupón -15%</span><b>-$150</b></div>
-      <div style="display:flex;justify-content:space-between;font-size:56px;border-top:3px solid #eee;margin-top:14px;padding-top:14px"><span>Total</span><b>$849</b></div>
-    </div>
-    <div class="metodos" style="position:absolute;top:690px;left:60px;right:60px;display:grid;gap:22px;font:700 46px Inter">
-      ${['Apple Pay', 'Tarjeta', 'OXXO Pay'].map((m, i) => `<div class="m" style="height:130px;border-radius:34px;display:flex;align-items:center;padding:0 46px;justify-content:space-between;background:#fff;box-shadow:inset 0 0 0 3px ${i ? '#eee' : '#111'}">${m}<span>${i ? '○' : '●'}</span></div>`).join('')}
-    </div>
-    <div class="boton negro pagar" style="top:1250px;height:140px">Pagar $849</div>
-    <div class="exito" style="position:absolute;inset:0;background:#b6ff00;display:grid;place-items:center;text-align:center">
-      <div><div style="font:700 220px Pixel">✓</div><div style="font:900 90px Inter">Es tuya.</div><div class="pixel" style="font:700 52px Pixel;margin-top:20px">Pieza 023 / 50</div></div>
-    </div>`, { titulo: 'Tu', negrita: 'pedido' })),
-  paso(t, n) {
-    n.querySelector('.exito').style.opacity = tramo(t, 2.6, 2.9);
-    n.querySelector('.pagar').style.transform = `scale(${1 - 0.05 * tramo(t, 2.2, 2.4)})`;
+  hoodie(t) {
+    const i = indice(t), p = avance(t), c = camara(t);
+    let v = i, pose = poseCruda(t, i);
+    if (pose && p < 1) pose.opacidad = (pose.opacidad ?? 1) * tramo(p, 0.7, 1);
+    if (!pose && p < 1 && i > 0) { // la pantalla anterior se sigue viendo mientras entra la nueva
+      v = i - 1; pose = poseCruda(CORTES[i] - 0.001, v);
+      if (pose) pose.opacidad = (pose.opacidad ?? 1) * (1 - p);
+    }
+    if (!pose) return null;
+    const vx = posVista(v, t) ?? 0;
+    return { ...pose, x: CX + (SX + vx + pose.x - CX) * c.s + c.dx, y: CY + (SY + pose.y - CY) * c.s + c.dy, alto: pose.alto * c.s };
   },
 };
 
-// ---------- 2f · NFC + Mi colección ----------
-export const coleccion = {
-  dur: 9,
-  montar: () => escena('Llega. La escaneas.', 'Original, y a tu nombre.', telefono(`
-    <div class="escaneo" style="position:absolute;inset:0;background:#0b0b0b;color:#fff">
-      <div class="ondas" style="position:absolute;left:50%;top:620px;width:0;height:0"></div>
-      <div style="position:absolute;top:1000px;left:60px;right:60px;text-align:center;font:600 42px Inter;color:#ccc">Acerca tu celular a la etiqueta</div>
-      <div class="original" style="position:absolute;top:300px;left:60px;right:60px;border-radius:56px;background:#b6ff00;color:#000;padding:60px">
-        <div class="pixel" style="font:700 64px Pixel">✓ Original</div>
-        <div style="font:700 50px/1.4 Inter;margin-top:20px">Hoodie TU MARCA<br>Pieza 023 / 50<br>Dueño: @fan</div>
-        <div style="font:600 32px Inter;margin-top:20px;opacity:.7">Chip NFC no clonable · cosido en la etiqueta</div>
-      </div>
-    </div>
-    <div class="closet">
-      ${[0, 1, 2, 3, 4, 5].map((k) => `<div class="tarjeta-iri pila" style="left:${120 + k * 30}px;right:${120 + k * 30}px;top:${520 - k * 46}px;height:120px;filter:hue-rotate(${k * 30}deg);opacity:${1 - k * 0.1}"></div>`).reverse().join('')}
-      <div class="tarjeta-iri frente" style="left:70px;right:70px;top:560px;height:820px"></div>
-      <div class="chip blanco" style="position:absolute;top:1260px;left:110px">023 / 50 · @fan</div>
-    </div>`, { titulo: 'My', negrita: 'Collection' })),
-  paso(t, n) {
-    const fase2 = tramo(t, 4.3, 4.8);
-    n.querySelector('.escaneo').style.opacity = 1 - fase2;
-    n.querySelector('.closet').style.opacity = fase2;
-    const o = n.querySelector('.ondas');
-    o.innerHTML = [0, 1, 2].map((k) => { const f = ((t * 0.9 + k / 3) % 1); return `<div style="position:absolute;left:${-f * 300}px;top:${-f * 300}px;width:${f * 600}px;height:${f * 600}px;border-radius:50%;border:6px solid #b6ff00;opacity:${(1 - f) * (1 - tramo(t, 1.6, 2))}"></div>`; }).join('');
-    ver(n, '.original', tramo(t, 1.8, 2.3));
-    n.querySelectorAll('.pila').forEach((el, k) => aparecer(el, tramo(t, 4.6 + k * 0.08, 5.1 + k * 0.08)));
-    ver(n, '.frente', tramo(t, 5, 5.6));
-    const c = n.querySelector('.titulo'), s = n.querySelector('.sub');
-    if (t > 4.3) { c.textContent = 'Tu clóset digital'; s.textContent = 'Todo lo que compras, en un lugar.'; }
-    else { c.textContent = 'Llega. La escaneas.'; s.textContent = 'Original, y a tu nombre.'; }
-  },
-  hoodie: (t) => t < 5.1 ? null : { look: 'app', x: 540, y: PY + 990, alto: 640, giro: 0.3 + (t - 5) * 0.3, opacidad: tramo(t, 5.1, 5.6) },
-};
+// ---------- lo que se mueve dentro de cada pantalla ----------
+const scrollFeed = (t) => -760 * (1 - suave(tramo(t, 5.4, 6.9)));
+
+function animarPantallas(t, n) {
+  const q = (s) => n.querySelector(s);
+  // 0 · login
+  const conectando = t > 1.7;
+  q('.b-kick').textContent = conectando ? 'Conectando con Kick…' : 'Entrar con Kick';
+  // 1 · precio de sub
+  aparecer(q('.chip-sub'), resorte(tramo(t, 2.8, 3.4)));
+  q('.raya').style.width = `${100 * salida(tramo(t, 3.5, 3.9))}%`;
+  q('.precio-sub').textContent = '$' + cifra(1200 - 201 * salida(tramo(t, 3.7, 4.4)));
+  // 2 · feed y drop
+  q('.feed').style.transform = `translateY(${scrollFeed(t)}px)`;
+  const s = 2 * 86400 + 14 * 3600 + 7 * 60 + 33 - Math.floor(t * 3), d2 = (x) => String(x).padStart(2, '0');
+  q('.reloj').textContent = `${d2(Math.floor(s / 86400))}:${d2(Math.floor(s / 3600) % 24)}:${d2(Math.floor(s / 60) % 60)}:${d2(s % 60)}`;
+  const avisado = t > 8.3, b = q('.b-aviso');
+  b.textContent = avisado ? '✓ Te avisamos' : 'Avísame cuando abra'; b.className = 'boton b-aviso ' + (avisado ? 'neon' : 'blanco');
+  const toast = q('.toast'); const tp = Math.min(salida(tramo(t, 8.6, 9)), 1 - tramo(t, 9.6, 9.9));
+  toast.style.transform = `translateY(${-260 * (1 - tp)}px)`;
+  // 3 · ficha y AR
+  q('.ar').style.opacity = tramo(t, 14.4, 14.7);
+  aparecer(q('.chip-pieza'), resorte(tramo(t, 10.6, 11.2)));
+  q('.reticulo').style.opacity = t > 14.5 ? 1 - tramo(t, 15.4, 15.9) : 0;
+  q('.sombra').style.opacity = 0.5 * salida(tramo(t, 14.9, 15.6));
+  // 4 · cartera
+  q('.banner').style.transform = `translateY(${-300 * (1 - salida(tramo(t, 17.6, 18.1))) - (t > 18.8 ? 300 * tramo(t, 18.8, 19.1) : 0)}px)`;
+  const giro = 90 * (1 - salida(tramo(t, 19, 19.8)));
+  q('.cupon').style.transform = `perspective(1200px) rotateY(${giro}deg)`; q('.cupon').style.opacity = t > 19 ? 1 : 0;
+  const pf = tramo(t, 20, 21.6);
+  q('.pulso').style.left = `${8 + pf * 84}%`; q('.pulso').style.opacity = pf > 0 && pf < 1 ? 1 : 0;
+  aparecer(q('.flujo'), tramo(t, 19.8, 20.2));
+  // 5 · pago
+  const elegido = t > 23.4;
+  q('.m-apple').style.boxShadow = `inset 0 0 0 ${elegido ? 6 : 3}px #111`;
+  q('.hoja').style.transform = `translateY(${700 * (1 - salida(tramo(t, 24.3, 24.7)))}px)`;
+  q('.anillo').style.transform = `rotate(${t * 400}deg)`;
+  const ex = tramo(t, 25.2, 25.5); q('.exito').style.opacity = ex;
+  q('.exito .check').style.transform = `scale(${resorte(tramo(t, 25.2, 26))})`;
+  rafagaDePuntos(q('.confeti'), tramo(t, 25.25, 26.6));
+  // 6 · escaneo NFC
+  q('.etiqueta').style.transform = `translateY(${500 * (1 - salida(tramo(t, 27.4, 28.6)))}px)`;
+  q('.ondas').innerHTML = [0, 1, 2].map((k) => { const f = (t * 1.1 + k / 3) % 1; const fuerza = tramo(t, 27.8, 28.6) * (1 - tramo(t, 29, 29.3));
+    return `<div style="position:absolute;left:${-f * 320}px;top:${-f * 320}px;width:${f * 640}px;height:${f * 640}px;border-radius:50%;border:6px solid #b6ff00;opacity:${(1 - f) * fuerza}"></div>`; }).join('');
+  q('.original').style.transform = `scale(${resorte(tramo(t, 29, 29.8))})`; q('.original').style.opacity = t > 29 ? 1 : 0;
+  rafagaDePuntos(q('.confeti2'), tramo(t, 29.05, 30.3));
+  // 7 · clóset
+  n.querySelectorAll('.pila').forEach((el, k) => { const p = salida(tramo(t, 31.6 + k * 0.1, 32.2 + k * 0.1)); el.style.transform = `translateY(${(1 - p) * 500}px)`; el.style.opacity = p; });
+  const sw = salida(tramo(t, 33.6, 34.4));
+  q('.frente').style.transform = `translateX(${-sw * 900}px) rotate(${-sw * 12}deg)`;
+  q('.segunda').style.transform = `scale(${0.92 + 0.08 * salida(tramo(t, 33.8, 34.6))})`;
+  aparecer(q('.frente'), salida(tramo(t, 31.9, 32.5)));
+  q('.cuenta-closet').textContent = t > 34.1 ? '011 / 50 · Drop 000' : '023 / 50 · Drop 001';
+}
+
+// Confeti neón determinista (el mismo t da el mismo cuadro).
+function rafagaDePuntos(el, p) {
+  if (!el.children.length) el.innerHTML = Array.from({ length: 36 }, () => '<b></b>').join('');
+  [...el.children].forEach((b, k) => {
+    const a = k * 2.399, v = 280 + (k * 97 % 260), e = salida(p);
+    b.style.transform = `translate(${Math.cos(a) * v * e}px,${Math.sin(a) * v * e + 220 * p * p}px) rotate(${k * 40 + p * 300}deg)`;
+    b.style.opacity = p > 0 && p < 1 ? 1 - p * p : 0;
+  });
+}
