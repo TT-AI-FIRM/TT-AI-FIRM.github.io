@@ -92,6 +92,7 @@ export const cierre = {
     <div class="marca" style="position:absolute;left:0;right:0;bottom:200px;text-align:center;color:#fff">
       <div style="font:800 64px Inter;letter-spacing:6px">T.T AI FIRM</div>
       <div style="font:600 34px Inter;color:#fff9;margin-top:14px;letter-spacing:2px">ttfirm.ai</div>
+      <div style="font:400 22px Inter;color:#fff6;margin-top:40px">Música: “Voltaic”, Kevin MacLeod (incompetech.com) · CC BY 4.0</div>
     </div></div>`),
   paso(t, n) {
     aparecer(n.querySelector('.frase'), tramo(t, 0.3, 1.2));

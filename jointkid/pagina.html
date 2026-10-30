@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T.T AI Firm × jointkidkick</title>
+<meta name="description" content="Demo conceptual: lo que T.T AI Firm puede construir para la marca de ropa de jointkidkick.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#070907">
+<link rel="icon" href="../assets/fav.svg">
+<style>
+  @font-face { font-family: Pixel; src: url(assets/fuentes/silkscreen-700.woff2) format('woff2'); font-weight: 700; }
+  @font-face { font-family: Inter; src: url(assets/fuentes/inter-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: Inter; src: url(assets/fuentes/inter-800.woff2) format('woff2'); font-weight: 800; }
+  :root { --neon: #b6ff00; --fondo: #070907; --texto: #e9eee5; --tenue: #8b8f88; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: radial-gradient(80% 50% at 50% 30%, #16200f, var(--fondo) 70%) fixed, var(--fondo); color: var(--texto);
+    font: 600 16px/1.45 Inter, system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 32px; }
+  header { text-align: center; margin-bottom: 16px; }
+  .marca { font: 700 clamp(20px, 6vw, 28px) Pixel; letter-spacing: 2px; text-transform: uppercase; }
+  .marca span { color: var(--neon); }
+  .bajada { color: var(--tenue); font-size: 14px; margin-top: 6px; }
+  .marco { position: relative; width: min(100%, calc(78vh * 9 / 16), 460px); aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden;
+    background: #000; box-shadow: 0 0 0 1px #b6ff0033, 0 30px 80px #0008; }
+  video { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .sonido { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); border: 0; border-radius: 40px; padding: 12px 22px;
+    background: var(--neon); color: #000; font: 800 15px Inter; cursor: pointer; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
+  .acciones a { color: var(--texto); text-decoration: none; border-radius: 40px; padding: 12px 20px; box-shadow: inset 0 0 0 1px #ffffff2a; font-size: 15px; }
+  .acciones a.vivo { box-shadow: inset 0 0 0 1px var(--neon); color: var(--neon); }
+  .nota { max-width: 460px; text-align: center; color: var(--tenue); font-size: 13px; margin-top: 18px; }
+  .acciones a:focus-visible, .sonido:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">T.T AI Firm <span>×</span> jointkidkick</div>
+  <div class="bajada">Lo que podemos construir para tu marca de ropa</div>
+</header>
+<div class="marco">
+  <video id="v" src="assets/jointkid-demo-720.mp4" poster="assets/poster.jpg" playsinline muted autoplay loop preload="metadata"></video>
+  <button class="sonido" id="sonido" type="button">▶ Ver con sonido</button>
+</div>
+<div class="acciones">
+  <a class="vivo" href="vivo.html">Verlo en vivo, hecho en código</a>
+  <a href="assets/jointkid-demo-720.mp4" download>Descargar video</a>
+</div>
+<p class="nota">Demo conceptual. Las cifras son de ejemplo y la marca de ropa todavía no existe: “TU MARCA” y las prendas son genéricas.
+Música: “Voltaic”, Kevin MacLeod (incompetech.com), CC BY 4.0.</p>
+<script>
+  const v = document.getElementById('v'), b = document.getElementById('sonido');
+  b.addEventListener('click', () => { v.muted = false; v.currentTime = 0; v.play(); b.hidden = true; });
+</script>
+</body>
+</html>
