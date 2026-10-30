@@ -1,0 +1,16 @@
+# Demo conceptual · marca de ropa de @jointkidkick
+
+Video vertical de 90 s (1080×1920) hecho en código: HTML + three.js. El hoodie 3D no viene de un modelo externo: se arma en `js/hoodie.js`.
+
+| Archivo | Qué contiene |
+|---|---|
+| `js/main.js` | El reloj y el orden de las 15 escenas. El mismo segundo siempre da el mismo cuadro |
+| `js/hoodie.js` | El hoodie 3D y sus dos looks: `app` (blanco) y `noche` (negro con neón) |
+| `js/escenas/campana.js` | Entrada, ráfaga de lo que sigue y cierre |
+| `js/escenas/fan.js` | Central del fan, dentro del celular: login, drop, ficha 3D/AR, puntos, pago, NFC y clóset |
+| `js/escenas/stream.js` | Overlay de T.T en el stream |
+| `js/escenas/panel.js` | Central del dueño: hoy, pedido, gráfica, ganancia e IA |
+
+- `?t=12.5` congela el video en ese segundo. `?exportar` no arranca solo: el exportador llama `window.irA(t)` cuadro por cuadro.
+- Las cifras son de meta y coherentes entre escenas (38 piezas, $39,850, ganancia $20,200). Viven al inicio de `panel.js`.
+- Kick: solo lo que da su API pública. Seguidores, historial de viewers e ingresos no salen de Kick; la gráfica dice que los viewers los guarda T.T.
